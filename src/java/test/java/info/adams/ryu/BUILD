@@ -5,8 +5,8 @@ java_test(
   test_class = "info.adams.ryu.AllTests",
   srcs = glob(["*.java"]),
   deps = [
-    "//src/main/java/info/adams/ryu",
-    "//src/main/java/info/adams/ryu/analysis",
+    "//main/java/info/adams/ryu",
+    "//main/java/info/adams/ryu/analysis",
     "//third_party/jaffer",
     "//third_party/junit",
   ],

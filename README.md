@@ -5,9 +5,6 @@ Doubleback provides round-trip parsing and printing of 64-bit double-precision f
 Doubleback is in development and is not ready for use or contributions.
 
 # Roadmap for first release
-* Import ulfjack/ryu
-* Separate c and java 
-* Separate benchmarks and tests
-* Nice charts in readme
 * Setup global makefile
-* Setup travis and github actions
+* Nice charts in readme
+* Setup github actions
