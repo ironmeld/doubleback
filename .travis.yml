@@ -18,6 +18,7 @@ addons:
         key_url: 'https://bazel.build/bazel-release.pub.gpg'
     packages:
       - bazel
+      - gnuplot
   homebrew:
     packages: bazel
 
