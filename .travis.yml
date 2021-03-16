@@ -20,7 +20,9 @@ addons:
       - bazel
       - gnuplot
   homebrew:
-    packages: bazel
+    packages:
+      - bazel
+      - gnuplot
 
 language: c
 
