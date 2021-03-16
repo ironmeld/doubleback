@@ -1,3 +1,4 @@
+----------------------------------------------------------------------
 Unless otherwise noted in this file, all files in this project are
 Copyright 2021 Richard R. Masters and Contributors
 
@@ -17,3 +18,14 @@ Section 5 of the Apache 2.0 license.)
    Original at https://www.apache.org/licenses/LICENSE-2.0
 2  See file LICENSE-Boost
    Original at https://opensource.org/licenses/BSL-1.0
+
+----------------------------------------------------------------------
+Regarding files located in src/c and src/java:
+
+All code outside of third_party/ is copyrighted by Ulf Adams and contributors,
+and may be used freely in accordance with the Apache 2.0 license.
+Alternatively, the files in the ryu/ directory may be used freely in
+accordance with the Boost 1.0 license.
+All contributions are required to maintain these licenses.
+See CONTRIBUTORS file in src/c directory.
+----------------------------------------------------------------------
