@@ -1,3 +1,4 @@
+#!/bin/bash
 bazel test //ryu/...
 if [ "$TRAVIS_OS_NAME" = "osx" ]; then bazel test --run_under="leaks --atExit -- " //ryu/...; fi
 bazel run -c opt //ryu/benchmark:ryu_benchmark --
