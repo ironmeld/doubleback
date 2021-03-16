@@ -16,3 +16,4 @@ Doubleback is in development and is not ready for use or contributions.
 | Language | Upstream Project |
 |----------|------------------|
 | C        | https://github.com/ulfjack/ryu |
+| Java     | https://github.com/ulfjack/ryu |
