@@ -7,9 +7,44 @@ The Doubleback project unifies code forked from various github projects. See Ack
 Doubleback is in development and is not ready for use or contributions.
 
 # Roadmap for first release
-* Setup global makefile
+* Makefile test target
 * Nice charts in readme
 * Setup github actions
+* Standard interfaces
+
+# Getting Started
+
+```
+$ git clone https://github.com/ironmeld/doubleback
+$ cd doubleback
+```
+
+If you do not have these packages installed, then you will need to install them:
+* bazel
+    * On Ubuntu:
+```
+curl -sSL "https://bazel.build/bazel-release.pub.gpg" | sudo -E apt-key add -
+sudo echo "deb https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee -a /etc/apt/sources.list
+sudo apt-get update
+sudo apt-get install bazel
+```
+*  cmake
+    * On Ubuntu:
+```
+wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+# Replace xenial with DISTRIB_CODENAME from /etc/lsb-release:
+sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ xenial main'
+sudo apt-get update
+sudo apt-get install cmake
+```
+*  make
+*  gcc
+*  gnuplot
+
+Build in all languages:
+```
+$ make
+```
 
 # Acknowledgements
 
