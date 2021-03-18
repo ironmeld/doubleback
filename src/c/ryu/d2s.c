@@ -37,8 +37,8 @@
 
 #ifdef RYU_DEBUG
 #include <inttypes.h>
-#include <stdio.h>
 #endif
+#include <stdio.h>
 
 #include "ryu/common.h"
 #include "ryu/digit_table.h"
@@ -505,5 +505,127 @@ void d2s_buffered(double f, char* result) {
 char* d2s(double f) {
   char* const result = (char*) malloc(25);
   d2s_buffered(f, result);
+  return result;
+}
+
+int to_fixed_chars(char* result, int len, uint64_t mantissa, int32_t exponent) {
+    int neg = 0;
+    if (result[0] == '-') {
+        neg = 1;
+        result++;
+    }
+    if (exponent == 0) {
+        if (result[1] == '.') {
+            // 1.132E0 just strip off E0
+            return len - 2;
+        } else {
+            // 4E0 -> 4.0
+            const uint32_t olength = decimalLength17(mantissa);
+            result[olength] = '.';
+            result[olength + 1] = '0';
+            return 3 + neg;
+        }
+    }
+    else {
+        if (exponent > 0) {
+            if (result[1] == '.') {
+                const uint32_t olength = decimalLength17(mantissa);
+                memmove(result + 1, result + 2, exponent);
+                if (exponent + 1 >= olength) {
+                    if (exponent + 1 > olength) {
+                        memset(result + olength, '0', exponent + 1 - olength);
+                    }
+                    result[exponent + 1] = '.';
+                    result[exponent + 2] = '0';
+                    return exponent + 3 + neg;
+                } else {
+                    result[exponent + 1] = '.';
+                    return len - (decimalLength17(exponent) + 1);
+                }
+            } else {
+                memset(result + 1, '0', exponent);
+                result[exponent + 1] = '.';
+                result[exponent + 2] = '0';
+                return exponent + 3 + neg;
+            }
+        }
+        else {
+            const uint32_t elength = decimalLength17(exponent * -1) + 2;
+            if (result[1] == '.') {
+                memmove(result + 2 - exponent, result + 2, (len - elength) - 2 );
+                result[1 - exponent] = result[0];
+                memset(result, '0', 1 - exponent);
+                result[1] = '.';
+                return (len - elength) - exponent;
+            } else {
+                result[1 - exponent] = result[0];
+                memset(result, '0', 1 - exponent);
+                result[1] = '.';
+                return (len - elength) - exponent + 1;
+            }
+        }
+    }
+    return len;
+}
+
+int dfmt_n(double f, char* result) {
+  // Step 1: Decode the floating-point number, and unify normalized and subnormal cases.
+  const uint64_t bits = double_to_bits(f);
+
+#ifdef RYU_DEBUG
+  printf("IN=");
+  for (int32_t bit = 63; bit >= 0; --bit) {
+    printf("%d", (int) ((bits >> bit) & 1));
+  }
+  printf("\n");
+#endif
+
+  // Decode bits into sign, mantissa, and exponent.
+  const bool ieeeSign = ((bits >> (DOUBLE_MANTISSA_BITS + DOUBLE_EXPONENT_BITS)) & 1) != 0;
+  const uint64_t ieeeMantissa = bits & ((1ull << DOUBLE_MANTISSA_BITS) - 1);
+  const uint32_t ieeeExponent = (uint32_t) ((bits >> DOUBLE_MANTISSA_BITS) & ((1u << DOUBLE_EXPONENT_BITS) - 1));
+  // Case distinction; exit early for the easy cases.
+  if (ieeeExponent == ((1u << DOUBLE_EXPONENT_BITS) - 1u) || (ieeeExponent == 0 && ieeeMantissa == 0)) {
+    return copy_special_str(result, ieeeSign, ieeeExponent, ieeeMantissa);
+  }
+
+  floating_decimal_64 v;
+  const bool isSmallInt = d2d_small_int(ieeeMantissa, ieeeExponent, &v);
+  if (isSmallInt) {
+    // For small integers in the range [1, 2^53), v.mantissa might contain trailing (decimal) zeros.
+    // For scientific notation we need to move these zeros into the exponent.
+    // (This is not needed for fixed-point notation, so it might be beneficial to trim
+    // trailing zeros in to_chars only if needed - once fixed-point notation output is implemented.)
+    for (;;) {
+      const uint64_t q = div10(v.mantissa);
+      const uint32_t r = ((uint32_t) v.mantissa) - 10 * ((uint32_t) q);
+      if (r != 0) {
+        break;
+      }
+      v.mantissa = q;
+      ++v.exponent;
+    }
+  } else {
+    v = d2d(ieeeMantissa, ieeeExponent);
+  }
+
+  int len;
+  const uint32_t olength = decimalLength17(v.mantissa);
+  int32_t exp = v.exponent + (int32_t) olength - 1;
+  if ( exp <= -5 || exp >= 17) {
+      len = to_chars(v, ieeeSign, result);
+  } else {
+      len = to_chars(v, ieeeSign, result);
+      len = to_fixed_chars(result, len, v.mantissa, exp);
+  }
+
+  return len;
+}
+
+char *dfmt(double f, char* result) {
+  const int index = dfmt_n(f, result);
+
+  // Terminate the string.
+  result[index] = '\0';
   return result;
 }

@@ -83,8 +83,9 @@ double generate_double(uint64_t* r) {
 
 static int bench64_general(const uint32_t samples, const uint32_t iterations, int alt, const bool parse, const bool csv, const bool verbose, const bool length) {
   char input[BUFFER_SIZE];
-  char bufferown[BUFFER_SIZE];
-  char buffer[BUFFER_SIZE];
+  char buffer_d2s[BUFFER_SIZE];
+  char buffer_dfmt[BUFFER_SIZE];
+  char buffer_snprintf[BUFFER_SIZE];
   int precision = 0;
   char fmt[100];
   int throwaway = 0;
@@ -100,6 +101,10 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, in
     init(&mv3);
     mean_and_variance mv4;
     init(&mv4);
+    mean_and_variance mv5;
+    init(&mv5);
+    mean_and_variance mv6;
+    init(&mv6);
     for (int i = 0; i < samples; ++i) {
       uint64_t r = 0;
       double f = generate_double(&r);
@@ -111,50 +116,68 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, in
 
       clock_t t1 = clock();
       for (int j = 0; j < iterations; ++j) {
-        d2s_buffered(f, bufferown);
-        throwaway += bufferown[2];
+        d2s_buffered(f, buffer_d2s);
+        throwaway += buffer_d2s[2];
       }
       clock_t t2 = clock();
       double delta1 = ((t2 - t1) * 1000000000.0) / ((double) iterations) / ((double) CLOCKS_PER_SEC);
       update(&mv1, delta1);
-      update(&mv3, (double) strlen(bufferown));
+      update(&mv2, (double) strlen(buffer_d2s));
 
       double delta2 = 0.0;
       t1 = clock();
       for (int j = 0; j < iterations; ++j) {
-        snprintf(buffer, BUFFER_SIZE, "%.17g", f);
-        throwaway += buffer[2];
+        snprintf(buffer_snprintf, BUFFER_SIZE, "%.17g", f);
+        throwaway += buffer_snprintf[2];
       }
       t2 = clock();
       delta2 = ((t2 - t1) * 1000000000.0) / ((double) iterations) / ((double) CLOCKS_PER_SEC);
-      update(&mv2, delta2);
-      update(&mv4, (double) strlen(buffer));
+      update(&mv3, delta2);
+      update(&mv4, (double) strlen(buffer_snprintf));
+
+      double delta3 = 0.0;
+      t1 = clock();
+      for (int j = 0; j < iterations; ++j) {
+        dfmt(f, buffer_dfmt);
+        throwaway += buffer_dfmt[2];
+      }
+      t2 = clock();
+      delta3 = ((t2 - t1) * 1000000000.0) / ((double) iterations) / ((double) CLOCKS_PER_SEC);
+      update(&mv5, delta3);
+      update(&mv6, (double) strlen(buffer_dfmt));
 
       // verbose implies csv
       if (verbose) {
         if (length) {
-            printf("%s,%" PRIu64 ",%f,%f,%s\n", bufferown, r, (double) strlen(bufferown), (double) strlen(buffer), buffer);
+            printf("%s,%" PRIu64 ",%f,%f,%f,%s,%s\n", buffer_d2s, r, (double) strlen(buffer_d2s), (double) strlen(buffer_snprintf), (double) strlen(buffer_dfmt), buffer_snprintf, buffer_dfmt);
         } else {
-            printf("%s,%" PRIu64 ",%f,%f,%s\n", bufferown, r, delta1, delta2, buffer);
+            printf("%s,%" PRIu64 ",%f,%f,%f,%s,%s\n", buffer_d2s, r, delta1, delta2, delta3, buffer_snprintf, buffer_dfmt);
         }
       }
     }
     if (!verbose) {
       if (length) {
         if (csv) {
-          printf("%d,%.3f,%.3f,", precision, mv3.mean, stddev(&mv3));
-          printf("%.3f,%.3f", mv4.mean, stddev(&mv4));
+          printf("%d,", precision);
+          printf("%.3f,%.3f,", mv2.mean, stddev(&mv2));
+          printf("%.3f,%.3f,", mv4.mean, stddev(&mv4));
+          printf("%.3f,%.3f", mv6.mean, stddev(&mv6));
         } else {
-          printf("%d %8.3f %8.3f", precision, mv3.mean, stddev(&mv3));
+          printf("%d", precision);
+          printf("%8.3f %8.3f", mv2.mean, stddev(&mv2));
           printf("     %8.3f %8.3f", mv4.mean, stddev(&mv4));
+          printf("     %8.3f %8.3f", mv6.mean, stddev(&mv6));
         }
       } else {
         if (csv) {
-          printf("%d,%.3f,%.3f,", precision, mv1.mean, stddev(&mv1));
-          printf("%.3f,%.3f", mv2.mean, stddev(&mv2));
+          printf("%d,", precision);
+          printf("%.3f,%.3f,", mv1.mean, stddev(&mv1));
+          printf("%.3f,%.3f,", mv3.mean, stddev(&mv3));
+          printf("%.3f,%.3f", mv5.mean, stddev(&mv5));
         } else {
           printf("%d %8.3f %8.3f", precision, mv1.mean, stddev(&mv1));
-          printf("     %8.3f %8.3f", mv2.mean, stddev(&mv2));
+          printf("     %8.3f %8.3f", mv3.mean, stddev(&mv3));
+          printf("     %8.3f %8.3f", mv5.mean, stddev(&mv5));
         }
       }
       printf("\n");

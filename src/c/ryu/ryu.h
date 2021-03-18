@@ -39,6 +39,9 @@ int d2exp_buffered_n(double d, uint32_t precision, char* result);
 void d2exp_buffered(double d, uint32_t precision, char* result);
 char* d2exp(double d, uint32_t precision);
 
+int dfmt_buffered_n(double f, char* result);
+char *dfmt(double f, char* result);
+
 #ifdef __cplusplus
 }
 #endif
