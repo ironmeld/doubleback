@@ -16,7 +16,7 @@ Doubleback is in development and is not ready for use or contributions.
 
 # Getting Started
 
-There are a number of dependencies for building Doubleback. See the [build document](doc/Build.md).
+There are a number of dependencies for building Doubleback. See the [build document](docs/Build.md).
 
 ```
 $ git clone https://github.com/ironmeld/doubleback
