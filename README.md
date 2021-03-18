@@ -8,7 +8,6 @@ Doubleback is in development and is not ready for use or contributions.
 
 # Roadmap for first release
 * Makefile test target
-* Nice charts in readme
 * Setup github actions
 * Standard interfaces
 
@@ -52,3 +51,11 @@ $ make
 |----------|------------------|
 | C        | https://github.com/ulfjack/ryu |
 | Java     | https://github.com/ulfjack/ryu |
+
+
+# Charts that show Ryu is Fast with Short Output
+
+![Ryu ranges from 10 to 20 times faster than standard printf](results/shortest-native-c-double-time.png "Time to Output")
+
+![Ryu output is 30% to 96% out the output length](results/shortest-native-c-double-length.png "Output Length")
+

@@ -21,6 +21,15 @@ cc_binary(
 )
 
 cc_binary(
+  name = "ryu_benchmark_shortest",
+  srcs = ["benchmark_shortest.c"],
+  deps = [
+    "//ryu",
+    "//third_party/mersenne",
+  ],
+)
+
+cc_binary(
   name = "ryu_printf_benchmark",
   srcs = ["benchmark_fixed.cc"],
   deps = [

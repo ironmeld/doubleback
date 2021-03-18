@@ -81,3 +81,87 @@ CONVERSION_CMD_RYU_PRINTF="".join([
   for p in ["1", "10", "100", "1000"]
 ]
 
+[genrule(
+  name = "shortest-native-" + t + "-" + f + "-csv",
+  tools = [dep],
+  outs = ["shortest-native-" + t + "-" + f + ".csv"],
+  cmd = "$(location " + dep + ") -classic -samples=500 -v > $@",
+) for (t,f,dep) in [
+    ("c", "double", "//ryu/benchmark:ryu_benchmark_shortest"),
+  ]
+]
+
+CONVERSION_CMD_RYU_SHORTEST="".join([
+    "TMP_FILE=$$(mktemp /tmp/plot.XXXXXX)",
+    " && cat $(location %s.template)",
+    "  | sed \"s|INPUT_FILE|$<|g\"",
+    "  | sed \"s|LANGUAGE|%s|g\"",
+    "  | sed \"s|COMPARISON_NAME_1|%s|g\"",
+    "  > $${TMP_FILE}",
+    " && gnuplot $${TMP_FILE} > $@",
+    " && rm -f $${TMP_FILE}"])
+
+[genrule(
+  name = "shortest-native-" + t + "-" + f + "-pdf",
+  srcs = ["shortest-native-" + t + "-" + f + ".csv"],
+  tools = ["printf.template"],
+  outs = ["shortest-native-" + t + "-" + f + ".pdf"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("printf", t, c),
+) for (t,c) in [("c","snprintf %.17g")] for f in ["double"]
+]
+
+[genrule(
+  name = "shortest-native-" + t + "-" + f + "-time-csv",
+  tools = [dep],
+  outs = ["shortest-native-" + t + "-" + f + "-time.csv"],
+  cmd = "$(location " + dep + ") -csv -classic -samples=500 > $@",
+) for (t,f,dep) in [
+    ("c", "double", "//ryu/benchmark:ryu_benchmark_shortest"),
+  ]
+]
+
+[genrule(
+  name = "shortest-native-" + t + "-" + f + "-time-pdf",
+  srcs = ["shortest-native-" + t + "-" + f + "-time.csv"],
+  tools = ["shortest-native-time.template"],
+  outs = ["shortest-native-" + t + "-" + f + "-time.pdf"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-time", t, c),
+) for (t,c) in [("c","snprintf %.17g")] for f in ["double"]
+]
+
+[genrule(
+  name = "shortest-native-" + t + "-" + f + "-time-png",
+  srcs = ["shortest-native-" + t + "-" + f + "-time.csv"],
+  tools = ["shortest-native-time-png.template"],
+  outs = ["shortest-native-" + t + "-" + f + "-time.png"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-time-png", t, c),
+) for (t,c) in [("c","snprintf %.17g")] for f in ["double"]
+]
+
+[genrule(
+  name = "shortest-native-" + t + "-" + f + "-length-csv",
+  tools = [dep],
+  outs = ["shortest-native-" + t + "-" + f + "-length.csv"],
+  cmd = "$(location " + dep + ") -length -csv -classic -samples=500 > $@",
+) for (t,f,dep) in [
+    ("c", "double", "//ryu/benchmark:ryu_benchmark_shortest"),
+  ]
+]
+
+[genrule(
+  name = "shortest-native-" + t + "-" + f + "-length-pdf",
+  srcs = ["shortest-native-" + t + "-" + f + "-length.csv"],
+  tools = ["shortest-native-length.template"],
+  outs = ["shortest-native-" + t + "-" + f + "-length.pdf"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-length", t, c),
+) for (t,c) in [("c","snprintf %.17g")] for f in ["double"]
+]
+
+[genrule(
+  name = "shortest-native-" + t + "-" + f + "-length-png",
+  srcs = ["shortest-native-" + t + "-" + f + "-length.csv"],
+  tools = ["shortest-native-length-png.template"],
+  outs = ["shortest-native-" + t + "-" + f + "-length.png"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-length-png", t, c),
+) for (t,c) in [("c","snprintf %.17g")] for f in ["double"]
+]
