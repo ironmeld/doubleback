@@ -16,8 +16,6 @@ CONVERSION_CMD_RYU="".join([
 ) for (t,f,o,dep) in [
     ("c", "float", "-32", "//ryu/benchmark:ryu_benchmark"),
     ("c", "double", "-64", "//ryu/benchmark:ryu_benchmark"),
-    ("java", "float", "-32", "//src/main/java/info/adams/ryu/benchmark"),
-    ("java", "double", "-64", "//src/main/java/info/adams/ryu/benchmark"),
 ]]
 
 [genrule(
@@ -26,9 +24,7 @@ CONVERSION_CMD_RYU="".join([
   tools = [f + ".template"],
   outs = ["shortest-" + t + "-" + f + ".pdf"],
   cmd = CONVERSION_CMD_RYU % (f, c, d),
-) for (t,c,d) in [("c","Grisu3",""),("java","Jdk","Jaffer")] for f in ["float","double"]]
-
-
+) for (t,c,d) in [("c","Grisu3","")] for f in ["float","double"]]
 
 CONVERSION_CMD_RYU_PRINTF="".join([
     "TMP_FILE=$$(mktemp /tmp/plot.XXXXXX)",
