@@ -135,18 +135,23 @@ However, for the number "0.3" Ryu shortest outputs "3E-1" instead of "0.3". Ryu 
 
 I suspect there was an early intent to provide the equivalent %g functionality, as stated in the paper:
 ```
-This paper describes the Ryu Printf algorithm, which generates printf-identical output for the %f, %e, and %g formats with arbitrary runtime-provided precision parameters, i.e., printf("%.<p>f",<f>), printf("%.<p>e",<f>), and printf("%.<p>g",<f>) for any precision p and floating-point value f.
+This paper describes the Ryu Printf algorithm, which generates printf-identical output
+for the %f, %e, and %g formats with arbitrary runtime-provided precision parameters,
+i.e., printf("%.<p>f",<f>), printf("%.<p>e",<f>), and printf("%.<p>g",<f>)
+for any precision p and floating-point value f.
 ```
 
 However, there is this statement further down:
 ```
-We do not discuss the %g format in detail as it is merely a combination format: depending on the provided value, the implementation decides whether to use %f or %e format.
+We do not discuss the %g format in detail as it is merely a combination format:
+depending on the provided value, the implementation decides whether to use %f or %e format.
 ```
 
 Later, Adams demonstrates awareness that %g has additional complexity:
 
 ```
-For the %g specifier, printf picks either %f or %e formatting, depending on the exponent, and also omits trailing zeros from the result.
+For the %g specifier, printf picks either %f or %e formatting, depending on the exponent,
+and also omits trailing zeros from the result.
 ```
 
 As described in the previous section, the implementation of %g is not so trivial as it seems upon first glance.
@@ -158,8 +163,7 @@ So additional work is required to implement %g formatting.
 The "flagship" API for Doubleback in C notation is:
 
 ```
-char *dfmt(double value, char *buffer) {
-}
+char *dfmt(double value, char *buffer);
 ```
 
 This output is similar to printf("%.17g") except it is shorter in three ways: it uses Ryu to pick the shortest representation, it never zero-pads the exponent, and it does not print a plus sign for positive exponents.
