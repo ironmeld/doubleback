@@ -311,7 +311,7 @@ static inline floating_decimal_64 d2d(const uint64_t ieeeMantissa, const uint32_
   return fd;
 }
 
-static inline int to_chars(const floating_decimal_64 v, const bool sign, char* const result) {
+static inline int to_chars(const floating_decimal_64 v, const bool sign, char* const result, char exp_char) {
   // Step 5: Print the decimal representation.
   int index = 0;
   if (sign) {
@@ -397,7 +397,7 @@ static inline int to_chars(const floating_decimal_64 v, const bool sign, char* c
   }
 
   // Print the exponent.
-  result[index++] = 'E';
+  result[index++] = exp_char;
   int32_t exp = v.exponent + (int32_t) olength - 1;
   if (exp < 0) {
     result[index++] = '-';
@@ -492,7 +492,7 @@ int d2s_buffered_n(double f, char* result) {
     v = d2d(ieeeMantissa, ieeeExponent);
   }
 
-  return to_chars(v, ieeeSign, result);
+  return to_chars(v, ieeeSign, result, 'E');
 }
 
 void d2s_buffered(double f, char* result) {
@@ -508,7 +508,24 @@ char* d2s(double f) {
   return result;
 }
 
-int to_fixed_chars(char* result, int len, uint64_t mantissa, int32_t exponent) {
+static inline int copy_special_str_dfmt(char * const result, const bool sign, const bool exponent, const bool mantissa) {
+  if (mantissa) {
+    memcpy(result, "NaN", 3);
+    return 3;
+  }
+  if (sign) {
+    result[0] = '-';
+  }
+  if (exponent) {
+    memcpy(result + sign, "Infinity", 8);
+    return sign + 8;
+  }
+  memcpy(result + sign, "0.0", 3);
+  return sign + 3;
+}
+
+int dreformat(char* result, int len, uint64_t mantissa, int32_t exponent) {
+    assert(exponent >= -4 && exponent <= 16);
     int neg = 0;
     if (result[0] == '-') {
         neg = 1;
@@ -530,8 +547,10 @@ int to_fixed_chars(char* result, int len, uint64_t mantissa, int32_t exponent) {
         if (exponent > 0) {
             if (result[1] == '.') {
                 const uint32_t olength = decimalLength17(mantissa);
+                // exponent is 1 to 17
                 memmove(result + 1, result + 2, exponent);
                 if (exponent + 1 >= olength) {
+                    // 4.XeY -> 4X00.0
                     if (exponent + 1 > olength) {
                         memset(result + olength, '0', exponent + 1 - olength);
                     }
@@ -539,10 +558,12 @@ int to_fixed_chars(char* result, int len, uint64_t mantissa, int32_t exponent) {
                     result[exponent + 2] = '0';
                     return exponent + 3 + neg;
                 } else {
+                    // 4.XYeZ -> 4X.Y
                     result[exponent + 1] = '.';
                     return len - (decimalLength17(exponent) + 1);
                 }
             } else {
+                // 4EX -> 4{'0'*X}.0
                 memset(result + 1, '0', exponent);
                 result[exponent + 1] = '.';
                 result[exponent + 2] = '0';
@@ -552,12 +573,14 @@ int to_fixed_chars(char* result, int len, uint64_t mantissa, int32_t exponent) {
         else {
             const uint32_t elength = decimalLength17(exponent * -1) + 2;
             if (result[1] == '.') {
+                // 4.XE-Y -> 0.004X
                 memmove(result + 2 - exponent, result + 2, (len - elength) - 2 );
                 result[1 - exponent] = result[0];
                 memset(result, '0', 1 - exponent);
                 result[1] = '.';
                 return (len - elength) - exponent;
             } else {
+                // 4E-X -> 0.004
                 result[1 - exponent] = result[0];
                 memset(result, '0', 1 - exponent);
                 result[1] = '.';
@@ -586,7 +609,7 @@ int dfmt_n(double f, char* result) {
   const uint32_t ieeeExponent = (uint32_t) ((bits >> DOUBLE_MANTISSA_BITS) & ((1u << DOUBLE_EXPONENT_BITS) - 1));
   // Case distinction; exit early for the easy cases.
   if (ieeeExponent == ((1u << DOUBLE_EXPONENT_BITS) - 1u) || (ieeeExponent == 0 && ieeeMantissa == 0)) {
-    return copy_special_str(result, ieeeSign, ieeeExponent, ieeeMantissa);
+    return copy_special_str_dfmt(result, ieeeSign, ieeeExponent, ieeeMantissa);
   }
 
   floating_decimal_64 v;
@@ -613,10 +636,10 @@ int dfmt_n(double f, char* result) {
   const uint32_t olength = decimalLength17(v.mantissa);
   int32_t exp = v.exponent + (int32_t) olength - 1;
   if ( exp <= -5 || exp >= 17) {
-      len = to_chars(v, ieeeSign, result);
+      len = to_chars(v, ieeeSign, result, 'e');
   } else {
-      len = to_chars(v, ieeeSign, result);
-      len = to_fixed_chars(result, len, v.mantissa, exp);
+      len = to_chars(v, ieeeSign, result, 'e');
+      len = dreformat(result, len, v.mantissa, exp);
   }
 
   return len;

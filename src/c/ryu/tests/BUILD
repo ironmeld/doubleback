@@ -82,3 +82,11 @@ cc_test(
   ],
 )
 
+cc_test(
+  name = "dfmt_test",
+  srcs = ["dfmt_test.cc"],
+  deps = [
+    "//ryu",
+    "//third_party/gtest",
+  ],
+)
