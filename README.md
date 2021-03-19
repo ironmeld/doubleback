@@ -174,17 +174,18 @@ To avoid memory allocation and threading complications a small memory buffer mus
  
 The "ergonomic magic" of "0.3" instead of ".299999999..." is awesome, but at what performance cost compared to printf %g?
 
-The benchmark Adams provided for Ryu "shortest" is against Google's double_conversion (Grisu3). We provide new benchmarks at the boottom of this page for Doubleback/Ryu dfmt vs snprintf %g vs Ryu shortest.
+The benchmark Adams provided for Ryu "shortest" is against Google's double_conversion (Grisu3). We provide new benchmarks at the bottom of this page for Doubleback/Ryu dfmt vs snprintf %g vs Ryu shortest.
 
 # Why not DragonBox or other?
 
-The performance benefits of DragonBox are compelling [1] and I was close to going all in on DragonBox instead of Ryu. However, at the time of this writing (Mar 13, 2021) DragonBox is around 6 months old and has not been peer reviewed or implemented in any language other than C++. Ryu, on the other hand, has received substantial investment in development and testing. There are implementations at various stages of development for over ten different programming languages. Microsoft developed an implementation and extensive tests for incorporation into libc++ that spans over 60,000 lines of code [2]. There is a similar effort for Go although it appears to have stalled [3].
+The performance benefits of DragonBox [1] are compelling [2] and I was close to going all in on DragonBox instead of Ryu. However, at the time of this writing (Mar 13, 2021) DragonBox is around 6 months old and has not been peer reviewed or implemented in any language other than C++. Ryu, on the other hand, has received substantial investment in development and testing. There are implementations at various stages of development for over ten different programming languages. Microsoft developed an implementation and extensive tests for incorporation into libc++ that spans over 60,000 lines of code [3]. There is a similar effort for Go although it appears to have stalled [4].
 
 I think it is likely that an algorithm different from Ryu, perhaps DragonBox, will ultimately be considered the state-of-the-art. That algorithm will likely be functionally equivalent and could be a compelling candidate to replace Ryu in the future. But for now, the next-gen floating-point boat has already departed and Ryu is on it.
 
-1. https://github.com/abolz/Drachennest/
-2. https://reviews.llvm.org/D70631
-3. https://github.com/golang/go/issues/15672
+1. https://github.com/jk-jeon/dragonbox
+2. https://github.com/abolz/Drachennest/
+3. https://reviews.llvm.org/D70631
+4. https://github.com/golang/go/issues/15672
 
 # Acknowledgements
 
