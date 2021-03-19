@@ -104,7 +104,7 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   tools = ["printf.template"],
   outs = ["shortest-native-" + t + "-" + f + ".pdf"],
   cmd = CONVERSION_CMD_RYU_SHORTEST % ("printf", t, c, d),
-) for (t,c,d) in [("c","snprintf %.17g","dfmt")] for f in ["double"]
+) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
 ]
 
 [genrule(
@@ -123,7 +123,7 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   tools = ["shortest-native-time.template"],
   outs = ["shortest-native-" + t + "-" + f + "-time.pdf"],
   cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-time", t, c, d),
-) for (t,c,d) in [("c","snprintf %.17g","dfmt")] for f in ["double"]
+) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
 ]
 
 [genrule(
@@ -132,7 +132,7 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   tools = ["shortest-native-time-png.template"],
   outs = ["shortest-native-" + t + "-" + f + "-time.png"],
   cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-time-png", t, c, d),
-) for (t,c,d) in [("c","snprintf %.17g","dfmt")] for f in ["double"]
+) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
 ]
 
 [genrule(
@@ -151,7 +151,7 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   tools = ["shortest-native-length.template"],
   outs = ["shortest-native-" + t + "-" + f + "-length.pdf"],
   cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-length", t, c, d),
-) for (t,c,d) in [("c","snprintf %.17g","dfmt")] for f in ["double"]
+) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
 ]
 
 [genrule(
@@ -160,5 +160,5 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   tools = ["shortest-native-length-png.template"],
   outs = ["shortest-native-" + t + "-" + f + "-length.png"],
   cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-length-png", t, c, d),
-) for (t,c,d) in [("c","snprintf %.17g","dfmt")] for f in ["double"]
+) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
 ]

@@ -22,6 +22,8 @@ set xlabel "Precision of Input Number"
 set xrange [0:18]
 set xtics 1, 1, 17
 
+set key right center
+
 # Line Colors
 set style line 1 lc rgb '#334c87' lt 1 lw 2  # blue
 set style line 2 lc rgb '#cb1a0e' lt 1 lw 2  # red
