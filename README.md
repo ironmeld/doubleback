@@ -19,6 +19,8 @@ Doubleback provides round-trip parsing and printing of 64-bit double-precision f
 
 The Doubleback project unifies code forked from various github projects. See Acknowledgements.
 
+Look at the difference in output between these functions:
+
 glibc:
 ```
 printf("%.17g", 0.3);
@@ -40,7 +42,7 @@ printf("%s", dfmt(0.3, buf));
 0.3
 ```
 
-So, only dfmt formats 0.3 as "0.3".
+Only dfmt formats 0.3 as "0.3".
 
 Doubleback dfmt is basically `Ryu shortest` reformatted to be like `printf("%.17g")`:
 
