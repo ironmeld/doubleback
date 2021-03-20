@@ -1,5 +1,5 @@
 set datafile separator ","
-set term pdf size 24cm, 18cm font "Helvetica,16"
+set term pdf size 24cm, 18cm font "Helvetica,18"
 set tics font "Helvetica,12"
 set title "Avg Output Length by Input Precision, LANGUAGE language"
 
@@ -27,20 +27,15 @@ set xtics 1, 1, 17
 set key right center
 
 # Line Colors
-set style line 1 lc rgb '#334c87' lt 1 lw 2  # blue
-set style line 2 lc rgb '#cb1a0e' lt 1 lw 2  # red
-set style line 3 lc rgb '#5e9c36' lt 1 lw 2  # green not used
+set style line 1 lc rgb '#cb1a0e' lt 1 lw 2  # red
+set style line 2 lc rgb '#334c87' lt 1 lw 2  # blue
+set style line 3 lc rgb '#5e9c36' lt 1 lw 2  # green
 
-# Value Labels, disabled due to crowding.
-#     "INPUT_FILE" using ($1):2:(sprintf("%.1f",$2)) ls 1 pt 5 ps 1 with labels offset -1.5,0.2 font ",9" notitle,\
-#     "INPUT_FILE" using ($1+.2):4:(sprintf("%.1f",$4)) ls 2 pt 5 ps 1 with labels offset 1.5,0.5 font ",9" notitle,\
-#     "INPUT_FILE" using ($1+.2):6:(sprintf("%.1f",$6)) ls 3 pt 5 ps 1 with labels offset 1.5,-0.2 font ",9" notitle,\
-
-plot "INPUT_FILE" using ($1):2:3 ls 1 pt 5 ps 1 title 'Ryu shortest' with yerrorbars,\
-     "INPUT_FILE" using ($1):2 ls 1 smooth csplines notitle,\
+plot "INPUT_FILE" using 1:4:5 ls 1 pt 5 ps 1 title 'snprintf %.17g' with yerrorbars,\
+     "INPUT_FILE" using 1:4 ls 1 smooth csplines notitle,\
 \
-     "INPUT_FILE" using ($1+.2):4:5 ls 2 pt 7 ps 1 title 'COMPARISON_NAME_1' with yerrorbars,\
-     "INPUT_FILE" using ($1+.2):4 ls 2 smooth csplines notitle,\
+     "INPUT_FILE" using 1:8:9 ls 2 pt 7 ps 1 title 'Ryu shortest' with yerrorbars,\
+     "INPUT_FILE" using 1:8 ls 2 smooth csplines notitle,\
 \
-     "INPUT_FILE" using ($1+.2):6:7 ls 3 pt 7 ps 1 title 'COMPARISON_NAME_2' with yerrorbars,\
-     "INPUT_FILE" using ($1+.2):6 ls 3 smooth csplines notitle
+     "INPUT_FILE" using ($1+.2):12:13 ls 3 pt 7 ps 1 title 'Doubleback dfmt' with yerrorbars,\
+     "INPUT_FILE" using ($1+.2):12 ls 3 smooth csplines notitle

@@ -25,6 +25,7 @@ cc_binary(
   srcs = ["benchmark_shortest.c"],
   deps = [
     "//ryu",
+    "//ryu:ryu_parse",
     "//third_party/mersenne",
   ],
 )

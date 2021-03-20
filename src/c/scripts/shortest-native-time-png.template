@@ -16,30 +16,27 @@ set style line 11 lc rgb '#404040' lt 0 lw 2
 set grid back ls 11
 
 # Axis and Labels
-set ylabel "Avg Time to Print Number in ns (Log Scale w/Std Dev.)"
+set ylabel "Avg Time to Print Number in ns, Log Scale w/Std Dev"
 set logscale y 2
 set xlabel "Precision of Input Number"
 set xrange [0:18]
 set xtics 1, 1, 17
 
-set key right center
+set key center center
 
 # Line Colors
-set style line 1 lc rgb '#334c87' lt 1 lw 2  # blue
-set style line 2 lc rgb '#cb1a0e' lt 1 lw 2  # red
+set style line 1 lc rgb '#cb1a0e' lt 1 lw 2  # red
+set style line 2 lc rgb '#334c87' lt 1 lw 2  # blue
 set style line 3 lc rgb '#5e9c36' lt 1 lw 2  # green
 
-# Value Labels, disabled due to crowding.
-#     "INPUT_FILE" using ($1):2:(sprintf("%.0f",$2)) ls 1 pt 5 ps 1 with labels offset -1.2,-0.3 font ",9" notitle,\
-#     "INPUT_FILE" using ($1+.2):6:(sprintf("%.0f",$6)) ls 1 pt 5 ps 1 with labels offset 1.2,0.3 font ",9" notitle,\
-
-plot "INPUT_FILE" using ($1):2:3 ls 1 pt 5 ps 1 title 'Ryu shortest' with yerrorbars,\
-     "INPUT_FILE" using ($1):2 ls 1 smooth csplines notitle,\
+plot "INPUT_FILE" using 1:2:3 ls 1 pt 5 ps 1 title 'snprintf %.17g' with yerrorbars,\
+     "INPUT_FILE" using 1:2:(sprintf("%.0f",$2)) ls 1 pt 5 ps 1 with labels offset 1.4,0.5 font ",10" notitle,\
+     "INPUT_FILE" using 1:2 ls 1 smooth csplines notitle,\
 \
-     "INPUT_FILE" using ($1+.2):4:5 ls 2 pt 7 ps 1 title 'COMPARISON_NAME_1' with yerrorbars,\
-     "INPUT_FILE" using ($1+.2):4:(sprintf("%.0f",$4)) ls 1 pt 5 ps 1 with labels offset 1.5,0.5 font ",9" notitle,\
-     "INPUT_FILE" using ($1+.2):4 ls 2 smooth csplines notitle,\
+     "INPUT_FILE" using ($1+.2):6:7 ls 2 pt 7 ps 1 title 'Ryu shortest' with yerrorbars,\
+     "INPUT_FILE" using ($1+.2):6 ls 2 smooth csplines notitle,\
 \
-     "INPUT_FILE" using ($1+.2):6:7 ls 3 pt 7 ps 1 title 'COMPARISON_NAME_2' with yerrorbars,\
-     "INPUT_FILE" using ($1+.2):6 ls 3 smooth csplines notitle
+     "INPUT_FILE" using ($1+.2):10:11 ls 3 pt 7 ps 1 title 'Doubleback dfmt' with yerrorbars,\
+     "INPUT_FILE" using ($1+.2):10:(sprintf("%.0f",$10)) ls 3 pt 5 ps 1 with labels offset 1.4,0.5 font ",10" notitle,\
+     "INPUT_FILE" using ($1+.2):10 ls 3 smooth csplines notitle
 

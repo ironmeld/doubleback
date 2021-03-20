@@ -63,8 +63,6 @@ Doubleback is in development and is not ready for use or contributions.
 
 # Roadmap for first release
 
-* dfmt tests
-* Setup github actions
 * Java dfmt
 
 # Getting Started
@@ -199,6 +197,8 @@ Doubleback is derived from upstream projects.
 
 # Charts that show Doubleback/Ryu is Fast with Short Output  <a name="pretty-charts"></a>
 
-![Doubleback/Ryu ranges from 10 to 20 times faster than standard printf](results/shortest-native-c-double-time.png "Time to Output")
+![Doubleback/Ryu prints 10 to 20 times faster than standard printf](results/shortest-native-c-double-time.png "Doubleback/Ryu ranges from 10 to 20 times faster than standard printf")
 
-![Doubleback/Ryu output is 30% to 96% out the output length](results/shortest-native-c-double-length.png "Output Length")
+![Doubleback/Ryu output is 30% to 96% the length of standard printf](results/shortest-native-c-double-length.png "Doubleback/Ryu output is 30% to 96% the length of standard printf")
+
+![Doubleback/Ryu parses approx. 3 to 7 times faster than standard strtod](results/shortest-native-c-double-parse.png "Doubleback/Ryu ranges from approx. 3 to 7 times faster than standard strtod")

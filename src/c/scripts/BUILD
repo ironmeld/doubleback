@@ -101,16 +101,16 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
 [genrule(
   name = "shortest-native-" + t + "-" + f + "-pdf",
   srcs = ["shortest-native-" + t + "-" + f + ".csv"],
-  tools = ["printf.template"],
+  tools = ["shortest.template"],
   outs = ["shortest-native-" + t + "-" + f + ".pdf"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("printf", t, c, d),
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest", t, c, d),
 ) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
 ]
 
 [genrule(
-  name = "shortest-native-" + t + "-" + f + "-time-csv",
+  name = "shortest-native-" + t + "-" + f + "-summary-csv",
   tools = [dep],
-  outs = ["shortest-native-" + t + "-" + f + "-time.csv"],
+  outs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
   cmd = "$(location " + dep + ") -csv -classic -samples=500 > $@",
 ) for (t,f,dep) in [
     ("c", "double", "//ryu/benchmark:ryu_benchmark_shortest"),
@@ -119,7 +119,7 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
 
 [genrule(
   name = "shortest-native-" + t + "-" + f + "-time-pdf",
-  srcs = ["shortest-native-" + t + "-" + f + "-time.csv"],
+  srcs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
   tools = ["shortest-native-time.template"],
   outs = ["shortest-native-" + t + "-" + f + "-time.pdf"],
   cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-time", t, c, d),
@@ -128,7 +128,7 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
 
 [genrule(
   name = "shortest-native-" + t + "-" + f + "-time-png",
-  srcs = ["shortest-native-" + t + "-" + f + "-time.csv"],
+  srcs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
   tools = ["shortest-native-time-png.template"],
   outs = ["shortest-native-" + t + "-" + f + "-time.png"],
   cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-time-png", t, c, d),
@@ -136,18 +136,8 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
 ]
 
 [genrule(
-  name = "shortest-native-" + t + "-" + f + "-length-csv",
-  tools = [dep],
-  outs = ["shortest-native-" + t + "-" + f + "-length.csv"],
-  cmd = "$(location " + dep + ") -length -csv -classic -samples=500 > $@",
-) for (t,f,dep) in [
-    ("c", "double", "//ryu/benchmark:ryu_benchmark_shortest"),
-  ]
-]
-
-[genrule(
   name = "shortest-native-" + t + "-" + f + "-length-pdf",
-  srcs = ["shortest-native-" + t + "-" + f + "-length.csv"],
+  srcs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
   tools = ["shortest-native-length.template"],
   outs = ["shortest-native-" + t + "-" + f + "-length.pdf"],
   cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-length", t, c, d),
@@ -156,9 +146,27 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
 
 [genrule(
   name = "shortest-native-" + t + "-" + f + "-length-png",
-  srcs = ["shortest-native-" + t + "-" + f + "-length.csv"],
+  srcs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
   tools = ["shortest-native-length-png.template"],
   outs = ["shortest-native-" + t + "-" + f + "-length.png"],
   cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-length-png", t, c, d),
+) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
+]
+
+[genrule(
+  name = "shortest-native-" + t + "-" + f + "-parse-pdf",
+  srcs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
+  tools = ["shortest-native-parse.template"],
+  outs = ["shortest-native-" + t + "-" + f + "-parse.pdf"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-parse", t, c, d),
+) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
+]
+
+[genrule(
+  name = "shortest-native-" + t + "-" + f + "-parse-png",
+  srcs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
+  tools = ["shortest-native-parse-png.template"],
+  outs = ["shortest-native-" + t + "-" + f + "-parse.png"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-parse-png", t, c, d),
 ) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
 ]
