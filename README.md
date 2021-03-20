@@ -33,14 +33,18 @@ printf("%s", buf);
 3E-1
 ```
 
-Doubleback dfmt - `Ryu shortest` reformatted to be like `printf("%.17g")`:
+Doubleback dfmt:
 ```
 char buf[32];
 printf("%s", dfmt(0.3, buf));
 0.3
 ```
 
-Ryu is an algorithm along with reference code developed by Ulf Adams, Google Germany in 2018 [1][2]. Ryu supports consistent round-trip parsing and "shortest" printing of 64-bit floating-point numbers. To be clear, Ryu is the breakthrough technology that makes Doubleback possible.
+So, only dfmt formats 0.3 as "0.3".
+
+Doubleback dfmt is basically `Ryu shortest` reformatted to be like `printf("%.17g")`:
+
+`Ryu shortest` is an algorithm along with reference code developed by Ulf Adams, Google Germany in 2018 [1][2]. Ryu supports consistent round-trip parsing and "shortest" printing of 64-bit floating-point numbers. To be clear, Ryu is the breakthrough technology that makes Doubleback possible.
 
 There are many older and established algorithms for printing floats. However, Ryu is in a new class of recently developed algorithms that claim substantial improvements over previous efforts.
 
