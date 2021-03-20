@@ -69,7 +69,9 @@ Doubleback is in development and is not ready for use or contributions.
 
 # Roadmap for first release
 
-* Java dfmt
+* C dparse
+* C Rountrip tests
+* Java
 
 # Getting Started
 
@@ -83,12 +85,14 @@ $ make
 
 # The Problem with Printing Floating-Point Numbers
 
+## Rounding Errors
 A big limitation of binary floating-point numbers is that some base 10 numbers like 0.1 cannot be precisely converted to binary [1]. If the number 0.1 is converted to a 64-bit number then it must be rounded to the nearest binary number. The resulting number in binary form is actually 0.1000000000000000055511151231257827021181583404541015625. [2]
 
 Now, say you want to print that binary number. A 64-bit floating point number requires, at most, 17 digits in base 10 (decimal) to accurately represent the number sufficiently so that it will return the same binary number when parsed back into binary [3]. However, at seventeen digits, the binary number above rounds to 0.10000000000000001. So, technically that is the most accurate decimal representation of the binary number at 17 digits. But the critical point is that, due to the rounding error described in the previous paragraph, 0.1 will round-trip back to 0.1000000000000000055511151231257827021181583404541015625 in binary. This is the exact same binary value that 0.10000000000000001 ends up rounding to when parsed.
 
 So if 0.1 and 0.10000000000000001 both preserve the information necessary to recover the exact same binary number, why not use the shorter one when printing it?  Well, an implementation may decide that the longer representation is preferred because it should try to honor the binary value as accurately as possible. From a mathematical point of view, it seems like the natural and correct thing to do.
 
+## Conflicting requirements
 It should be clear at this point that there are conflicting requirements. The best strategy for printing a floating-point number likely depends on its origin. Did the number originated from a binary calculation inside the computer or was it was originally entered by a human being using base 10 decimal? If a human entered the number, an equivalent but shorter representation is more likely appropriate. If a scientist wrote code to calcuate the number, it may be that ".10000000000000001" is a more accurate representation of the real number calculated and it would be preferable to leave it that way in case it is later parsed with *higher precision*. (Although it won't parse any differently at 64-bit precision.)
 
 A general printing algorithm does not know from which source the floating-point number originated. Moreover, it is reasonable to expect that determining the shortest representation in decimal that will recover the binary number will take more work than the alternative. In fact, there are some tricky issues that can lead to close-but-not-optimal solutions [4]. It should not be surprising then that many different algorithms have been implemented over the years and implementations continue to evolve as the research into new techniques also evolves.
@@ -114,18 +118,56 @@ The third opinion is that Ryu is the right algorithm at the right time for imple
 
 # What is printf %g formatting?  <a name="what-is-g"></a>
 
-Let's say you want printf to print a double accurately, with up to 17 significant digits *and* to print only as many digits as necessary for accuracy. The number "0.5" will round-trip perfectly into binary so there is no need to print 17 digits. If those are your requirements, then %.17g is the only printf format that fulfills them. Both %.17e and %.17f will print 17 digits, with zeros if necessary.
+```
+printf("%.17g\n", 0.5);
+0.5
+printf("%.17g\n", 113.166015625);
+113.166015625
+```
 
+Let's say you want printf to print a double accurately, with up to 17 significant digits **and** to print *only* as many digits as necessary for accuracy. The number "0.5" will round-trip perfectly into binary so there is no need to print 17 digits. If those are your requirements, then %.17g is the only printf format that fulfills them. Both %.17e and %.17f will print 17 digits, with zeros if necessary.
+
+```
+printf("%.17f\n", 0.5);
+0.50000000000000000
+printf("%.17f\n", 113.166015625);
+113.16601562500000000
+```
+
+## Dynamic Notation
 Furthermore %g will render without exponents if the number is not too big or too small (while factoring in the requested precision) otherwise it will render with exponents.
 
 Some of the details can be found here:
 https://stackoverflow.com/questions/54162152/what-precisely-does-the-g-printf-specifier-mean
 
+## Total Significant Digits
+
+```
+printf("%.3f", 54.5005)
+54.501
+printf("%.3g", 54.5005)
+54.5
+```
+
 There is one more aspect of %g that should be highlighted. The precision number specified in the %g format means *total significant digits* including both whole number digits and fractional digits, while the number means *fractional digits only* for %e and %f.
 
 The specification gives a formula by which %g can be converted to an equivalent %f which is P − (X + 1), where P is requested precision and X is the exponent of the value in scientific notation. The fact that %g precision is interpreted as total significant digits is documented in the printf man page under the description of precision but it is easy to overlook this detail.
 
+### Insufficient Precision
+
+```
+printf("%.3g", 54.5005)
+54.5
+```
+
 This "total significant digits" behavior can truncate some of the fractional digits if the number is large and the requested number of significant digits is not enough, because the significant digits may be used up by the whole number portion. This occurs if the number of significant digits left over after consumption by the whole number are *less than* necessary to accurately print the fractional part. The effect of this is to reduce the length of the string, for better or for worse. It would be bad if it unintentionally loses precision. To avoid that, one uses %.17g to make sure %g never truncates a digit necessary to accurately represent any 64-bit float. We can be sure that truncation is always throwing away useless digits. In the context of "%.17g", I think of this as "truncating digits that would otherwise overstate recoverable precision".
+
+### Excess Precision
+
+```
+printf("%.17g", 0.5)
+0.5
+```
 
 A potential downside of %.17g occurs when the number of significant digits left over for the fractional part are *more than*  necessary to display it accurately and the excess digits just end up as zeros. This brings in the second feature of %g - trailing fractional zeros are removed. Call this "truncating digits that are implied and therefore useless, even though they accurately reflect the recoverable precision".
 
