@@ -245,8 +245,8 @@ Doubleback is derived from upstream projects.
 
 # Charts that show Doubleback/Ryu is Fast with Short Output  <a name="pretty-charts"></a>
 
-![Doubleback/Ryu prints 10 to 20 times faster than standard printf](results/shortest-native-c-double-time.png "Doubleback/Ryu ranges from 10 to 20 times faster than standard printf")
+![Doubleback/Ryu prints 10 to 20 times faster than standard printf](results/c-double-shortest-bydigits-time.png "Doubleback/Ryu ranges from 10 to 20 times faster than standard printf")
 
-![Doubleback/Ryu output is 30% to 96% the length of standard printf](results/shortest-native-c-double-length.png "Doubleback/Ryu output is 30% to 96% the length of standard printf")
+![Doubleback/Ryu output is 30% to 96% the length of standard printf](results/c-double-shortest-bydigits-length.png "Doubleback/Ryu output is 30% to 96% the length of standard printf")
 
-![Doubleback/Ryu parses approx. 3 to 7 times faster than standard strtod](results/shortest-native-c-double-parse.png "Doubleback/Ryu ranges from approx. 3 to 7 times faster than standard strtod")
+![Doubleback/Ryu parses approx. 3 to 7 times faster than standard strtod](results/c-double-shortest-bydigits-parse.png "Doubleback/Ryu ranges from approx. 3 to 7 times faster than standard strtod")

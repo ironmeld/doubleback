@@ -82,7 +82,7 @@ double generate_double(uint64_t* r) {
   return f;
 }
 
-static int bench64_general(const uint32_t samples, const uint32_t iterations, const bool parse, const bool csv, const bool verbose) {
+static int bench64_general(const uint32_t samples, const uint32_t iterations, const bool data, const bool csv) {
   char input[BUFFER_SIZE];
   char buffer_d2s[BUFFER_SIZE];
   char buffer_dfmt[BUFFER_SIZE];
@@ -170,8 +170,8 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
       update(&dfmt_time_mv, dfmt_time);
       update(&dfmt_len_mv, (double) strlen(buffer_dfmt));
 
-      // verbose implies csv
-      if (verbose) {
+      // data implies csv
+      if (data) {
         printf("%" PRIu64 ",%s,%f,%f,%s,%f,%f,%s,%f,%f,%f,%f\n", r,
             buffer_d2s, d2s_time, (double) strlen(buffer_d2s),
             buffer_snprintf, snp_time, (double) strlen(buffer_snprintf),
@@ -179,7 +179,8 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
             strtod_time, s2d_time);
       }
     }
-    if (!verbose) {
+    // summary stats by digits of precision
+    if (!data) {
         if (csv) {
           printf("%d,", precision);
           printf("%.3f,%.3f,", snp_time_mv.mean, stddev(&snp_time_mv));
@@ -221,19 +222,16 @@ int main(int argc, char** argv) {
 
   int32_t samples = 10000;
   int32_t iterations = 1000;
-  bool parse = false;
   bool csv = false;
-  bool verbose = false;
+  bool data = false;
   for (int i = 1; i < argc; i++) {
     char* arg = argv[i];
-    if (strcmp(arg, "-v") == 0) {
-      verbose = true;
+    if (strcmp(arg, "-data") == 0) {
+      data = true;
     } else if (strncmp(arg, "-samples=", 9) == 0) {
       sscanf(arg, "-samples=%i", &samples);
     } else if (strncmp(arg, "-iterations=", 12) == 0) {
       sscanf(arg, "-iterations=%i", &iterations);
-    } else if (strcmp(arg, "-parse") == 0) {
-      parse = true;
     } else if (strcmp(arg, "-csv") == 0) {
       csv = true;
     }
@@ -241,7 +239,7 @@ int main(int argc, char** argv) {
 
   setbuf(stdout, NULL);
 
-  if (verbose) {
+  if (data) {
     printf("intval,snprintf,snp_time,snp_length,d2s,d2s_time,d2s_len,dfmt_time,dfmt_len,strtod_time,d2s_time\n");
   } else {
     if (csv) {
@@ -256,7 +254,7 @@ int main(int argc, char** argv) {
   }
 
   int throwaway = 0;
-  throwaway += bench64_general(samples, iterations, parse, csv, verbose);
+  throwaway += bench64_general(samples, iterations, data, csv);
   if (argc == 1000) {
     // Prevent the compiler from optimizing the code away.
     printf("%d\n", throwaway);

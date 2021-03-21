@@ -77,96 +77,105 @@ CONVERSION_CMD_RYU_PRINTF="".join([
   for p in ["1", "10", "100", "1000"]
 ]
 
+# Charts for "shortest" and corresponding implementations
+
+# Generate data using doubles from 64bit ints
 [genrule(
-  name = "shortest-native-" + t + "-" + f + "-csv",
+  name = lang + "-double-shortest-64bit-data-csv",
   tools = [dep],
-  outs = ["shortest-native-" + t + "-" + f + ".csv"],
-  cmd = "$(location " + dep + ") -classic -samples=500 -v > $@",
-) for (t,f,dep) in [
-    ("c", "double", "//ryu/benchmark:ryu_benchmark_shortest"),
+  outs = [lang + "-double-shortest-64bit-data.csv"],
+  cmd = "$(location " + dep + ") -data -csv -samples=500 > $@",
+) for (lang,dep) in [
+    ("c", "//ryu/benchmark:ryu_benchmark_shortest"),
   ]
 ]
 
+# This is the gnuplot chart command, which supports naming the
+# programming language and up to three data series to compare.
 CONVERSION_CMD_RYU_SHORTEST="".join([
     "TMP_FILE=$$(mktemp /tmp/plot.XXXXXX)",
     " && cat $(location %s.template)",
     "  | sed \"s|INPUT_FILE|$<|g\"",
     "  | sed \"s|LANGUAGE|%s|g\"",
-    "  | sed \"s|COMPARISON_NAME_1|%s|g\"",
-    "  | sed \"s|COMPARISON_NAME_2|%s|g\"",
+    "  | sed \"s|SERIES1|%s|g\"",
+    "  | sed \"s|SERIES2|%s|g\"",
+    "  | sed \"s|SERIES3|%s|g\"",
     "  > $${TMP_FILE}",
     " && gnuplot $${TMP_FILE} > $@",
     " && rm -f $${TMP_FILE}"])
 
+# Generate the chart for raw data
 [genrule(
-  name = "shortest-native-" + t + "-" + f + "-pdf",
-  srcs = ["shortest-native-" + t + "-" + f + ".csv"],
+  name = lang + "-double-shortest-64bit-data-pdf",
+  srcs = [lang + "-double-shortest-64bit-data.csv"],
   tools = ["shortest.template"],
-  outs = ["shortest-native-" + t + "-" + f + ".pdf"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest", t, c, d),
-) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
+  outs = [lang + "-double-shortest-64bit-data.pdf"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest", lang, s1, s2, s3),
+) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
 ]
 
+# Generate stats using doubles grouped by number of digits
 [genrule(
-  name = "shortest-native-" + t + "-" + f + "-summary-csv",
+  name = lang + "-double-shortest-bydigits-summary-csv",
   tools = [dep],
-  outs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
-  cmd = "$(location " + dep + ") -csv -classic -samples=500 > $@",
-) for (t,f,dep) in [
-    ("c", "double", "//ryu/benchmark:ryu_benchmark_shortest"),
+  outs = [lang + "-double-shortest-bydigits-summary.csv"],
+  cmd = "$(location " + dep + ") -csv -samples=500 > $@",
+) for (lang,dep) in [
+    ("c", "//ryu/benchmark:ryu_benchmark_shortest"),
   ]
 ]
 
+# Generate stats using doubles grouped by number of digits
 [genrule(
-  name = "shortest-native-" + t + "-" + f + "-time-pdf",
-  srcs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
-  tools = ["shortest-native-time.template"],
-  outs = ["shortest-native-" + t + "-" + f + "-time.pdf"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-time", t, c, d),
-) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
+  name = lang + "-double-shortest-bydigits-time-pdf",
+  srcs = [lang + "-double-shortest-bydigits-summary.csv"],
+  tools = ["shortest-time.template"],
+  outs = [lang + "-double-shortest-bydigits-time.pdf"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-time", lang, s1, s2, s3),
+) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
 ]
 
 [genrule(
-  name = "shortest-native-" + t + "-" + f + "-time-png",
-  srcs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
-  tools = ["shortest-native-time-png.template"],
-  outs = ["shortest-native-" + t + "-" + f + "-time.png"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-time-png", t, c, d),
-) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
+  name = lang + "-double-shortest-bydigits-time-png",
+  srcs = [lang + "-double-shortest-bydigits-summary.csv"],
+  tools = ["shortest-time-png.template"],
+  outs = [lang + "-double-shortest-bydigits-time.png"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-time-png", lang, s1, s2, s3),
+) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
 ]
 
 [genrule(
-  name = "shortest-native-" + t + "-" + f + "-length-pdf",
-  srcs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
-  tools = ["shortest-native-length.template"],
-  outs = ["shortest-native-" + t + "-" + f + "-length.pdf"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-length", t, c, d),
-) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
+  name = lang + "-double-shortest-bydigits-length-pdf",
+  srcs = [lang + "-double-shortest-bydigits-summary.csv"],
+  tools = ["shortest-length.template"],
+  outs = [lang + "-double-shortest-bydigits-length.pdf"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-length", lang, s1, s2, s3),
+) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
 ]
 
 [genrule(
-  name = "shortest-native-" + t + "-" + f + "-length-png",
-  srcs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
-  tools = ["shortest-native-length-png.template"],
-  outs = ["shortest-native-" + t + "-" + f + "-length.png"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-length-png", t, c, d),
-) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
+  name = lang + "-double-shortest-bydigits-length-png",
+  srcs = [lang + "-double-shortest-bydigits-summary.csv"],
+  tools = ["shortest-length-png.template"],
+  outs = [lang + "-double-shortest-bydigits-length.png"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-length-png", lang, s1, s2, s3),
+) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
 ]
 
 [genrule(
-  name = "shortest-native-" + t + "-" + f + "-parse-pdf",
-  srcs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
-  tools = ["shortest-native-parse.template"],
-  outs = ["shortest-native-" + t + "-" + f + "-parse.pdf"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-parse", t, c, d),
-) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
+  name = lang + "-double-shortest-bydigits-parse-pdf",
+  srcs = [lang + "-double-shortest-bydigits-summary.csv"],
+  tools = ["shortest-parse.template"],
+  outs = [lang + "-double-shortest-bydigits-parse.pdf"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-parse", lang, s1, s2, s3),
+) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
 ]
 
 [genrule(
-  name = "shortest-native-" + t + "-" + f + "-parse-png",
-  srcs = ["shortest-native-" + t + "-" + f + "-summary.csv"],
-  tools = ["shortest-native-parse-png.template"],
-  outs = ["shortest-native-" + t + "-" + f + "-parse.png"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-native-parse-png", t, c, d),
-) for (t,c,d) in [("c","snprintf %.17g","Doubleback dfmt")] for f in ["double"]
+  name = lang + "-double-shortest-bydigits-parse-png",
+  srcs = [lang + "-double-shortest-bydigits-summary.csv"],
+  tools = ["shortest-parse-png.template"],
+  outs = [lang + "-double-shortest-bydigits-parse.png"],
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-parse-png", lang, s1, s2, s3),
+) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
 ]

@@ -1,5 +1,5 @@
 set datafile separator ","
-set term pdf size 24cm, 18cm font "Helvetica,18"
+set terminal pngcairo size 960,720 font "Helvetica,14"
 set tics font "Helvetica,12"
 set title "Avg Output Length by Input Precision, LANGUAGE language"
 
@@ -31,11 +31,11 @@ set style line 1 lc rgb '#cb1a0e' lt 1 lw 2  # red
 set style line 2 lc rgb '#334c87' lt 1 lw 2  # blue
 set style line 3 lc rgb '#5e9c36' lt 1 lw 2  # green
 
-plot "INPUT_FILE" using 1:4:5 ls 1 pt 5 ps 1 title 'snprintf %.17g' with yerrorbars,\
+plot "INPUT_FILE" using 1:4:5 ls 1 pt 5 ps 1 title 'SERIES1' with yerrorbars,\
      "INPUT_FILE" using 1:4 ls 1 smooth csplines notitle,\
 \
-     "INPUT_FILE" using 1:8:9 ls 2 pt 7 ps 1 title 'Ryu shortest' with yerrorbars,\
+     "INPUT_FILE" using 1:8:9 ls 2 pt 7 ps 1 title 'SERIES2' with yerrorbars,\
      "INPUT_FILE" using 1:8 ls 2 smooth csplines notitle,\
 \
-     "INPUT_FILE" using ($1+.2):12:13 ls 3 pt 7 ps 1 title 'Doubleback dfmt' with yerrorbars,\
+     "INPUT_FILE" using ($1+.2):12:13 ls 3 pt 7 ps 1 title 'SERIES3' with yerrorbars,\
      "INPUT_FILE" using ($1+.2):12 ls 3 smooth csplines notitle
