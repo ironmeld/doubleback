@@ -1,0 +1,45 @@
+set datafile separator ","
+set terminal pngcairo size 960,720 font "Helvetica,14"
+set tics font "Helvetica,12"
+set title "Avg Output Length by Input Precision, LANGUAGE language"
+
+# Background
+set object 1 rectangle from screen 0,0 to screen 1,1 fillcolor rgb"#f8f8ff" behind
+
+# Border
+set style line 10 lc rgb '#808080' lt 1 lw 3
+set border 3 back ls 10
+set tics nomirror
+
+# Grid
+set style line 11 lc rgb '#404040' lt 0 lw 2
+set grid back ls 11
+
+# Axis and Labels
+set ylabel "Avg Length of Number w/Std Dev"
+set yrange [1:27]
+set ytics 2, 1, 27
+
+set xlabel "Precision of Input Number"
+set xrange [0:18]
+set xtics 1, 1, 17
+
+set key top center
+
+# Line Colors
+set style line 1 lc rgb '#cb1a0e' lt 1 lw 2  # red
+set style line 2 lc rgb '#334c87' lt 1 lw 2  # blue
+set style line 3 lc rgb '#5e9c36' lt 1 lw 2  # green
+set style line 4 lc rgb '#cb4c87' lt 1 lw 2  # purple
+
+plot "INPUT_FILE" using 1:4:5 ls 1 pt 5 ps 1 title 'SERIES1' with yerrorbars,\
+     "INPUT_FILE" using 1:4 ls 1 smooth csplines notitle,\
+\
+     "INPUT_FILE" using ($1+.2):8:9 ls 2 pt 7 ps 1 title 'SERIES2' with yerrorbars,\
+     "INPUT_FILE" using ($1+.2):8 ls 2 smooth csplines notitle,\
+\
+     "INPUT_FILE" using ($1+.4):12:13 ls 3 pt 7 ps 1 title 'SERIES3' with yerrorbars,\
+     "INPUT_FILE" using ($1+.4):12 ls 3 smooth csplines notitle,\
+\
+     "INPUT_FILE" using ($1+.6):16:17 ls 4 pt 7 ps 1 title 'SERIES4' with yerrorbars,\
+     "INPUT_FILE" using ($1+.6):16 ls 4 smooth csplines notitle

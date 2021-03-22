@@ -90,3 +90,12 @@ cc_test(
     "//third_party/gtest",
   ],
 )
+
+cc_binary(
+  name = "dfmt_echo",
+  srcs = ["dfmt_echo.c"],
+  deps = [
+    "//ryu",
+    "//ryu:ryu_parse",
+  ],
+)

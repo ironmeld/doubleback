@@ -45,5 +45,5 @@ before_script:
   - bazel version
 
 script:
-  - (cd src/c && ./build-all.sh)
-  - (cd src/java && ./build-all.sh)
+  - make
+  - make test

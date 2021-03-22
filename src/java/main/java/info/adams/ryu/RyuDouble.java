@@ -94,6 +94,15 @@ public final class RyuDouble {
   }
 
   public static String doubleToString(double value, RoundingMode roundingMode) {
+    return doubleToString(value, roundingMode, 'E', -3, 7, true);
+  }
+
+  public static String dfmt(double value) {
+    return doubleToString(value, RoundingMode.ROUND_EVEN, 'e', -4, 17, false);
+  }
+
+  public static String doubleToString(double value,
+        RoundingMode roundingMode, char eChar, int minExp, int maxExp, boolean mimicJava) {
     // Step 1: Decode the floating point number, and unify normalized and subnormal cases.
     // First, handle all the trivial cases.
     if (Double.isNaN(value)) return "NaN";
@@ -242,7 +251,7 @@ public final class RyuDouble {
     int exp = e10 + vplength - 1;
 
     // Double.toString semantics requires using scientific notation if and only if outside this range.
-    boolean scientificNotation = !((exp >= -3) && (exp < 7));
+    boolean scientificNotation = !((exp >= minExp) && (exp < maxExp));
 
     int removed = 0;
 
@@ -250,7 +259,7 @@ public final class RyuDouble {
     long output;
     if (dmIsTrailingZeros || dvIsTrailingZeros) {
       while (dp / 10 > dm / 10) {
-        if ((dp < 100) && scientificNotation) {
+        if (mimicJava && (dp < 100) && scientificNotation) {
           // Double.toString semantics requires printing at least two digits.
           break;
         }
@@ -264,7 +273,7 @@ public final class RyuDouble {
       }
       if (dmIsTrailingZeros && roundingMode.acceptLowerBound(even)) {
         while (dm % 10 == 0) {
-          if ((dp < 100) && scientificNotation) {
+          if (mimicJava && (dp < 100) && scientificNotation) {
             // Double.toString semantics requires printing at least two digits.
             break;
           }
@@ -284,7 +293,7 @@ public final class RyuDouble {
           ((dv == dm && !(dmIsTrailingZeros && roundingMode.acceptLowerBound(even))) || (lastRemovedDigit >= 5) ? 1 : 0);
     } else {
       while (dp / 10 > dm / 10) {
-        if ((dp < 100) && scientificNotation) {
+        if (mimicJava && (dp < 100) && scientificNotation) {
           // Double.toString semantics requires printing at least two digits.
           break;
         }
@@ -324,14 +333,23 @@ public final class RyuDouble {
         result[index + olength - i] = (char) ('0' + c);
       }
       result[index] = (char) ('0' + output % 10);
-      result[index + 1] = '.';
-      index += olength + 1;
-      if (olength == 1) {
-        result[index++] = '0';
+      if (mimicJava) {
+          result[index + 1] = '.';
+          index += olength + 1;
+          if (olength == 1) {
+            result[index++] = '0';
+          }
+      } else {
+          if (olength > 1) {
+             result[index + 1] = '.';
+             index += olength + 1;
+          } else {
+             index += olength;
+          }
       }
 
-      // Print 'E', the exponent sign, and the exponent, which has at most three digits.
-      result[index++] = 'E';
+      // Print e/E, the exponent sign, and the exponent, which has at most three digits.
+      result[index++] = eChar;
       if (exp < 0) {
         result[index++] = '-';
         exp = -exp;
@@ -346,7 +364,7 @@ public final class RyuDouble {
       result[index++] = (char) ('0' + exp % 10);
       return new String(result, 0, index);
     } else {
-      // Otherwise follow the Java spec for values in the interval [1E-3, 1E7).
+      // Otherwise follow the Java spec for values in the interval [1E<minExp>, 1E<maxExp>).
       if (exp < 0) {
         // Decimal dot is before any of the digits.
         result[index++] = '0';
@@ -492,4 +510,29 @@ public final class RyuDouble {
                          + bits03 + bits12) >>> 21)
                          + (bits13 << 10)) >>> actualShift;
   }
+
+  public static boolean isValid(String value) {
+      int numDigits = 0;
+      for (int i = 0; i < value.length(); i++) {
+          char c = value.charAt(i);
+          if (c == 'e' || c == 'E') {
+             break;
+          }
+          if (c >= '0' && c <= '9') {
+             numDigits++;
+             if (numDigits > 17) {
+                 return false;
+             }
+          }
+      }
+      return true;
+  }
+
+  public static double dparse(String value) {
+      if (!isValid(value)) {
+          throw new IllegalArgumentException(value);
+      }
+      return Double.parseDouble(value);
+  }
+
 }

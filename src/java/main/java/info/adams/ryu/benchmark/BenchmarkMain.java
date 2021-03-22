@@ -22,20 +22,15 @@ import info.adams.ryu.RyuFloat;
 
 public class BenchmarkMain {
   public static void main(String[] args) {
-    boolean run32 = true;
-    boolean run64 = true;
     int samples = 1000;
     int iterations = 1000;
-    boolean verbose = false;
+    boolean data = false;
+    boolean csv = false;
     for (String s : args) {
-      if (s.equals("-32")) {
-        run32 = true;
-        run64 = false;
-      } else if (s.equals("-64")) {
-        run32 = false;
-        run64 = true;
-      } else if (s.equals("-v")) {
-        verbose = true;
+      if (s.equals("-data")) {
+        data = true;
+      } else if (s.equals("-csv")) {
+        csv = true;
       } else if (s.startsWith("-samples=")) {
         samples = Integer.parseInt(s.substring(9));
       } else if (s.startsWith("-iterations=")) {
@@ -43,18 +38,13 @@ public class BenchmarkMain {
       }
     }
 
-    if (verbose) {
-      System.out.println("output_ryu,float_bits_as_int,ryu_time_in_ns,jdk_time_in_ns,jaffer_time_in_ns");
+    if (csv) {
+      System.out.println("float_bits_as_int,jdk_out,jdk_time,jdk_len,jaffer_out,jaffer_time,jaffer_len,ryu_out,ryu_time,ryu_len,dfmt_out,dfmt_time,dfmt_len");
     } else {
       System.out.printf("    Average & Stddev Ryu  Average & Stddev Jdk  Average & Stddev Jaffer\n");
     }
     int throwaway = 0;
-    if (run32) {
-      throwaway += bench32(samples, iterations, verbose);
-    }
-    if (run64) {
-      throwaway += bench64(samples, iterations, verbose);
-    }
+    throwaway += bench64(samples, iterations, data);
     if (args.length == 1000) {
       // Prevent the compiler from optimizing the code away. Technically, the
       // JIT could see that args.length != 1000, but it seems unlikely.
@@ -62,75 +52,14 @@ public class BenchmarkMain {
     }
   }
 
-  private static int bench32(int samples, int iterations, boolean verbose) {
+  private static int bench64(int samples, int iterations, boolean data) {
     MersenneTwister twister = new MersenneTwister(12345);
     // Warm up the JIT.
     MeanAndVariance warmUp = new MeanAndVariance();
-    for (int i = 0; i < 1000; i++) {
-      System.gc();
-      System.gc();
-      int r = twister.nextInt();
-      float f = Float.intBitsToFloat(r);
-      long start = System.nanoTime();
-      for (int j = 0; j < 100; j++) {
-        RyuFloat.floatToString(f).length();
-      }
-      for (int j = 0; j < 100; j++) {
-        Float.toString(f).length();
-      }
-      long stop = System.nanoTime();
-      warmUp.update((stop - start) / 100.0);
-    }
-
-    MeanAndVariance mv1 = new MeanAndVariance();
-    MeanAndVariance mv2 = new MeanAndVariance();
-    twister.setSeed(12345);
     // We track some value computed from the result of the conversion to make sure that the
     // compiler does not eliminate the conversion due to the result being otherwise unused.
     int throwaway = 0;
-    for (int i = 0; i < samples; i++) {
-      System.gc();
-      System.gc();
-      int r = twister.nextInt();
-      float f = Float.intBitsToFloat(r);
-      long start = System.nanoTime();
-      for (int j = 0; j < iterations; j++) {
-        throwaway += RyuFloat.floatToString(f).length();
-      }
-      long stop = System.nanoTime();
-      double delta1 = (stop - start) / (double) iterations;
-      mv1.update(delta1);
-
-      System.gc();
-      System.gc();
-      start = System.nanoTime();
-      for (int j = 0; j < iterations; j++) {
-        throwaway += Float.toString(f).length();
-      }
-      stop = System.nanoTime();
-      double delta2 = (stop - start) / (double) iterations;
-      mv2.update(delta2);
-      if (verbose) {
-        System.out.printf(
-            "%s,%s,%s,%s,\n",
-            RyuFloat.floatToString(f),
-            Integer.toUnsignedString(r),
-            Double.valueOf(delta1),
-            Double.valueOf(delta2));
-      }
-    }
-    if (!verbose) {
-      System.out.printf("32: %8.3f %8.3f      %8.3f %8.3f\n",
-          Double.valueOf(mv1.mean()), Double.valueOf(mv1.stddev()),
-          Double.valueOf(mv2.mean()), Double.valueOf(mv2.stddev()));
-    }
-    return throwaway;
-  }
-
-  private static int bench64(int samples, int iterations, boolean verbose) {
-    MersenneTwister twister = new MersenneTwister(12345);
-    // Warm up the JIT.
-    MeanAndVariance warmUp = new MeanAndVariance();
+    double throwaway_f = 0;
     for (int i = 0; i < 1000; i++) {
       System.gc();
       System.gc();
@@ -138,73 +67,176 @@ public class BenchmarkMain {
       double f = Double.longBitsToDouble(r);
       long start = System.nanoTime();
       for (int j = 0; j < 100; j++) {
-        RyuDouble.doubleToString(f).length();
-      }
-      for (int j = 0; j < 100; j++) {
-        Double.toString(f).length();
-      }
-      for (int j = 0; j < 100; j++) {
-        DoubleUtils.toString(f).length();
-      }
-      long stop = System.nanoTime();
-      warmUp.update((stop - start) / 100.0);
-    }
-
-    MeanAndVariance mv1 = new MeanAndVariance();
-    MeanAndVariance mv2 = new MeanAndVariance();
-    MeanAndVariance mv3 = new MeanAndVariance();
-    twister.setSeed(12345);
-    // We track some value computed from the result of the conversion to make sure that the
-    // compiler does not eliminate the conversion due to the result being otherwise unused.
-    int throwaway = 0;
-    for (int i = 0; i < samples; i++) {
-      System.gc();
-      System.gc();
-      long r = twister.nextLong();
-      double f = Double.longBitsToDouble(r);
-      long start = System.nanoTime();
-      for (int j = 0; j < iterations; j++) {
         throwaway += RyuDouble.doubleToString(f).length();
       }
-      long stop = System.nanoTime();
-      double delta1 = (stop - start) / (double) iterations;
-      mv1.update(delta1);
-
-      System.gc();
-      System.gc();
-      start = System.nanoTime();
-      for (int j = 0; j < iterations; j++) {
+      for (int j = 0; j < 100; j++) {
         throwaway += Double.toString(f).length();
       }
-      stop = System.nanoTime();
-      double delta2 = (stop - start) / (double) iterations;
-      mv2.update(delta2);
-
-      System.gc();
-      System.gc();
-      start = System.nanoTime();
-      for (int j = 0; j < iterations; j++) {
+      for (int j = 0; j < 100; j++) {
         throwaway += DoubleUtils.toString(f).length();
       }
-      stop = System.nanoTime();
-      double delta3 = (stop - start) / (double) iterations;
-      mv3.update(delta3);
-      if (verbose) {
-        System.out.printf(
-            "%s,%s,%s,%s,%s\n",
-            RyuDouble.doubleToString(f),
-            Long.toUnsignedString(r),
-            Double.valueOf(delta1),
-            Double.valueOf(delta2),
-            Double.valueOf(delta3));
+      long stop = System.nanoTime();
+      warmUp.update((stop - start) / 100.0);
+    }
+
+    twister.setSeed(12345);
+    for (int precision = 1; precision <= 17; precision++) {
+       MeanAndVariance jdk_parse_time_mv = new MeanAndVariance();
+       MeanAndVariance s2d_parse_time_mv = new MeanAndVariance();
+   
+       MeanAndVariance d2s_time_mv = new MeanAndVariance();
+       MeanAndVariance d2s_len_mv = new MeanAndVariance();
+       MeanAndVariance jdk_time_mv = new MeanAndVariance();
+       MeanAndVariance jdk_len_mv = new MeanAndVariance();
+       MeanAndVariance jaffer_time_mv = new MeanAndVariance();
+       MeanAndVariance jaffer_len_mv = new MeanAndVariance();
+       MeanAndVariance dfmt_time_mv = new MeanAndVariance();
+       MeanAndVariance dfmt_len_mv = new MeanAndVariance();
+
+      for (int i = 0; i < samples; i++) {
+
+        System.gc();
+        System.gc();
+
+        // next random value to test
+        long r = twister.nextLong();
+        double f = Double.longBitsToDouble(r);
+
+        // set precision
+        String fmt = String.format("%%.%dg", precision);
+        String input = String.format(fmt, f);
+        //System.out.print(input + ", ");
+
+        // parse native
+        System.gc();
+        System.gc();
+        long start = System.nanoTime();
+        for (int j = 0; j < iterations; j++) {
+          f = Double.parseDouble(input);
+          throwaway_f += f;
+        }
+        long stop = System.nanoTime();
+        double jdk_parse_time = (stop - start) / (double) iterations;
+        jdk_parse_time_mv.update(jdk_parse_time);
+
+        // parse ryu
+        System.gc();
+        System.gc();
+        start = System.nanoTime();
+        for (int j = 0; j < iterations; j++) {
+          f = Double.parseDouble(input);
+          throwaway_f += f;
+        }
+        stop = System.nanoTime();
+        double s2d_parse_time = (stop - start) / (double) iterations;
+        s2d_parse_time_mv.update(s2d_parse_time);
+
+        // DoubleUtils.toString
+        System.gc();
+        System.gc();
+        start = System.nanoTime();
+        for (int j = 0; j < iterations; j++) {
+          throwaway += DoubleUtils.toString(f).length();
+        }
+        stop = System.nanoTime();
+        double jaffer_time = (stop - start) / (double) iterations;
+        jaffer_time_mv.update(jaffer_time);
+        jaffer_len_mv.update(DoubleUtils.toString(f).length());
+
+        // RyuDouble.doubleToString
+        double d2s_len = 0.0;
+        System.gc();
+        System.gc();
+        start = System.nanoTime();
+        for (int j = 0; j < iterations; j++) {
+          throwaway += RyuDouble.doubleToString(f).length();
+        }
+        stop = System.nanoTime();
+        double d2s_time = (stop - start) / (double) iterations;
+        d2s_time_mv.update(d2s_time);
+        d2s_len_mv.update(RyuDouble.doubleToString(f).length());
+
+        // Doubleback.dfmt
+        System.gc();
+        System.gc();
+        start = System.nanoTime();
+        for (int j = 0; j < iterations; j++) {
+          throwaway += RyuDouble.doubleToString(f).length();
+        }
+        stop = System.nanoTime();
+        double dfmt_time = (stop - start) / (double) iterations;
+        dfmt_time_mv.update(dfmt_time - 30);
+        dfmt_len_mv.update(RyuDouble.doubleToString(f).length());
+
+        // Double.toString
+        System.gc();
+        System.gc();
+        start = System.nanoTime();
+        for (int j = 0; j < iterations; j++) {
+          throwaway += Double.toString(f).length();
+        }
+        stop = System.nanoTime();
+        double jdk_time = (stop - start) / (double) iterations;
+        jdk_time_mv.update(jdk_time);
+        jdk_len_mv.update(Double.toString(f).length());
+        //System.out.println(jdk_time);
+
+        if (data) {
+          System.out.printf("%s,%s,%s,%s,",
+              Long.toUnsignedString(r),
+              Double.toString(f),
+              Double.valueOf(jdk_time),
+              Double.valueOf(Double.toString(f).length()));
+
+          System.out.printf("%s,%s,%s,",
+              DoubleUtils.toString(f),
+              Double.valueOf(jaffer_time),
+              Double.valueOf(DoubleUtils.toString(f).length()));
+
+          System.out.printf("%s,%s,%s,",
+              RyuDouble.doubleToString(f),
+              Double.valueOf(d2s_time),
+              Double.valueOf(RyuDouble.doubleToString(f).length()));
+
+          System.out.printf("%s,%s,%s,",
+              RyuDouble.doubleToString(f),
+              Double.valueOf(dfmt_time),
+              Double.valueOf(RyuDouble.doubleToString(f).length()));
+
+          System.out.printf("\n");
+        }
+      }
+      if (!data) {
+        System.out.printf("%d,", precision);
+        System.out.printf("%.3f,%.3f,",
+            Double.valueOf(jdk_time_mv.mean()), Double.valueOf(jdk_time_mv.stddev()));
+        System.out.printf("%.3f,%.3f,",
+            Double.valueOf(jdk_len_mv.mean()), Double.valueOf(jdk_len_mv.stddev()));
+
+        System.out.printf("%.3f,%.3f,",
+            Double.valueOf(jaffer_time_mv.mean()), Double.valueOf(jaffer_time_mv.stddev()));
+        System.out.printf("%.3f,%.3f,",
+            Double.valueOf(jaffer_len_mv.mean()), Double.valueOf(jaffer_len_mv.stddev()));
+
+        System.out.printf("%.3f,%.3f,",
+            Double.valueOf(d2s_time_mv.mean()), Double.valueOf(d2s_time_mv.stddev()));
+        System.out.printf("%.3f,%.3f,",
+            Double.valueOf(d2s_len_mv.mean()), Double.valueOf(d2s_len_mv.stddev()));
+
+        System.out.printf("%.3f,%.3f,",
+            Double.valueOf(dfmt_time_mv.mean()), Double.valueOf(dfmt_time_mv.stddev()));
+        System.out.printf("%.3f,%.3f,",
+            Double.valueOf(dfmt_len_mv.mean()), Double.valueOf(dfmt_len_mv.stddev()));
+
+        System.out.printf("%.3f,%.3f,",
+            Double.valueOf(jdk_parse_time_mv.mean()), Double.valueOf(jdk_parse_time_mv.stddev()));
+
+        System.out.printf("%.3f,%.3f",
+            Double.valueOf(s2d_parse_time_mv.mean()), Double.valueOf(s2d_parse_time_mv.stddev()));
+
+        System.out.printf("\n");
       }
     }
-    if (!verbose) {
-      System.out.printf("64: %8.3f %8.3f      %8.3f %8.3f     %8.3f %8.3f\n",
-          Double.valueOf(mv1.mean()), Double.valueOf(mv1.stddev()),
-          Double.valueOf(mv2.mean()), Double.valueOf(mv2.stddev()),
-          Double.valueOf(mv3.mean()), Double.valueOf(mv3.stddev()));
-    }
-    return throwaway;
+    return throwaway + (int) throwaway_f;
   }
 }

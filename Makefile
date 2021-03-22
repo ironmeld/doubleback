@@ -1,4 +1,7 @@
 all:
 	make -C src
 
-.PHONY: all
+test:
+	make -C src test
+
+.PHONY: all test

@@ -13,3 +13,14 @@ java_test(
   # Travis CI: No Java support on Windows.
   tags = ["nowindows"],
 )
+
+java_binary(
+  name = "dfmtecho",
+  main_class = "info.adams.ryu.DfmtEcho",
+  srcs = ["DfmtEcho.java"],
+  deps = [
+    "//main/java/info/adams/ryu",
+  ],
+  # Travis CI: No Java support on Windows.
+  tags = ["nowindows"],
+)
