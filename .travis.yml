@@ -39,11 +39,14 @@ install:
   - echo "test --test_tag_filters=-no$TRAVIS_OS_NAME" >> $HOME/.bazelrc
   - echo "test --test_output=errors" >> $HOME/.bazelrc
   - echo "test --test_verbose_timeout_warnings" >> $HOME/.bazelrc
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then copy c:\MinGW\bin\mingw32-make.exe c:\MinGW\bin\make.exe; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then set PATH=%PATH%;c:\MinGW\bin; fi
 
 before_script:
   - mkdir -p "$HOME/.cache/bazel/"
   - bazel version
 
 script:
+  - echo $PATH
   - make
   - make test
