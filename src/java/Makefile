@@ -12,4 +12,9 @@ test:
 run-echo:
 	@bazel run -c opt //test/java/info/adams/ryu:dfmtecho --
 
+# WARNING: deletes bazel cache which may affect other projects
+clean:
+	rm -rf bazel-*
+	rm -rf ~/.cache/bazel
+
 .PHONY: all test

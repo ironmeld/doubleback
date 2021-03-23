@@ -173,8 +173,8 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
       // data implies csv
       if (data) {
         printf("%" PRIu64 ",%s,%f,%f,%s,%f,%f,%s,%f,%f,%f,%f\n", r,
-            buffer_d2s, d2s_time, (double) strlen(buffer_d2s),
             buffer_snprintf, snp_time, (double) strlen(buffer_snprintf),
+            buffer_d2s, d2s_time, (double) strlen(buffer_d2s),
             buffer_dfmt, dfmt_time, (double) strlen(buffer_dfmt),
             strtod_time, s2d_time);
       }

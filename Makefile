@@ -4,4 +4,7 @@ all:
 test:
 	make -C src test
 
-.PHONY: all test
+clean:
+	make -C src clean
+
+.PHONY: all test clean

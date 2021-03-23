@@ -5,6 +5,6 @@ IFS=$'\n\t'
 for subdir in ./*; do
   # support sparse checkouts by only building what is present
   if [ -d "$subdir" ]; then
-    make -C "$subdir"
+      make -C "$subdir" "$1"
   fi
 done

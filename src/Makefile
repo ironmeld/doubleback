@@ -1,7 +1,10 @@
 all:
-	./build-subdirs.sh
+	./build-subdirs.sh all
 
 test:
-	./test-subdirs.sh
+	./build-subdirs.sh test
 
-.PHONY: all
+clean:
+	./build-subdirs.sh clean
+
+.PHONY: all test clean
