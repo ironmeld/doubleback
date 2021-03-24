@@ -261,3 +261,19 @@ enum Status s2d_n(const char * buffer, const int len, double * result) {
 enum Status s2d(const char * buffer, double * result) {
   return s2d_n(buffer, strlen(buffer), result);
 }
+
+enum Status dparse(const char * buffer, double * result) {
+  int digits = 0;
+  for (int i=0; i < strlen(buffer); i++) {
+      if (buffer[i] == 'e' || buffer[i] == 'E') {
+          break;
+      }
+      if (buffer[i] >= '0' && buffer[i] <= '9') {
+         digits++;
+         if (digits > 17) {
+            return MALFORMED_INPUT;
+         }
+      }
+  }
+  return s2d_n(buffer, strlen(buffer), result);
+}

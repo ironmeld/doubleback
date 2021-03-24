@@ -591,9 +591,9 @@ int dreformat(char* result, int len, uint64_t mantissa, int32_t exponent) {
     return len;
 }
 
-int dfmt_n(double f, char* result) {
+int dfmt_n(double d, char* result) {
   // Step 1: Decode the floating-point number, and unify normalized and subnormal cases.
-  const uint64_t bits = double_to_bits(f);
+  const uint64_t bits = double_to_bits(d);
 
 #ifdef RYU_DEBUG
   printf("IN=");
@@ -645,8 +645,8 @@ int dfmt_n(double f, char* result) {
   return len;
 }
 
-char *dfmt(double f, char* result) {
-  const int index = dfmt_n(f, result);
+char *dfmt(double d, char* result) {
+  const int index = dfmt_n(d, result);
 
   // Terminate the string.
   result[index] = '\0';

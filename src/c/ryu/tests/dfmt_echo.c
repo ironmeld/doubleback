@@ -40,7 +40,7 @@ int main (int argc, char **argv) {
     double d;
     while (fgets(buffer, 1024, stdin) != NULL) {
         buffer[strcspn(buffer,"\n")] = 0;
-        if (s2d(buffer, &d) == SUCCESS) {
+        if (dparse(buffer, &d) == SUCCESS) {
             dfmt(d, buffer);
             puts(buffer);
         } else {

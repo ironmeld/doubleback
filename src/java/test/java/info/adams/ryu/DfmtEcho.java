@@ -14,17 +14,19 @@
 
 package info.adams.ryu;
 
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
 
 class DfmtEcho {
-    public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
-        while (input.hasNextLine()) {
-            String nextValue = input.nextLine();
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String nextValue;
+        while ((nextValue = br.readLine()) != null) {
             if (RyuDouble.isValid(nextValue)) {
                 double f = Double.parseDouble(nextValue);
                 System.out.println(RyuDouble.dfmt(f));
-            } else {
+                    } else {
                 System.out.println("ERROR");
             }
         }
