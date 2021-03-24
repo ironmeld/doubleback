@@ -1,9 +1,12 @@
 all:
 	./build-all.sh
 
+DFMT_TEST_INPUT ?= ../test-input.csv
+DFMT_TEST_EXPECTED ?= ../test-expected.csv
+
 test:
-	@cat ../test-input.csv | bazel run -c opt //ryu/tests:dfmt_echo -- > test.out
-	@diff ../test-expected.csv test.out
+	@cat $(DFMT_TEST_INPUT) | bazel run -c opt //ryu/tests:dfmt_echo -- > test.out
+	@diff $(DFMT_TEST_EXPECTED) test.out
 	@rm -f test.out
 
 # for manual testing
