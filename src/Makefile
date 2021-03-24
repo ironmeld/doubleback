@@ -3,7 +3,7 @@ all:
 
 
 gendoubles: gendoubles.c
-	cc gendoubles.c -o gendoubles
+	gcc gendoubles.c -o gendoubles
 
 test: gendoubles
 	# run tests in each subdir
