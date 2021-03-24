@@ -5,20 +5,20 @@
 * [Roadmap for first release](#roadmap-for-first-release)
 * [Getting Started](#getting-started)
 * [The Problem with Printing Floating-Point Numbers](#the-problem-with-printing-floating-point-numbers)
-* [The Doubleback Rationale](#the-doubleback-rationale)
 * [What is printf %g formatting?](#what-is-g)
+* [Background on Ryu Formats](#background-on-ryu-formats)
+* [The Doubleback Rationale](#the-doubleback-rationale)
 * [The Doubleback Format](#the-doubleback-format)
 * [The Doubleback APIs](#the-doubleback-apis)
-* [Benchmarks](#benchmarks)
 * [Why not DragonBox or other?](#why-not-dragonbox-or-other)
 * [Acknowledgements](#acknowledgements)
-* [Charts that show Doubleback/Ryū is Fast with Short Output](#pretty-charts)
+* [Benchmarks](#benchmarks)
 
 # Doubleback
 
 Doubleback provides round-trip parsing and printing of 64-bit double-precision floating-point numbers using the Ryū algorithm implemented in multiple programming languages. Doubleback is biased towards "human-friendly" output which round-trips consistently between binary and decimal.
 
-The Doubleback project unifies code forked from various github projects. See Acknowledgements.
+The Doubleback project unifies code forked from various github projects. See [Acknowledgements](#acknowledgements).
 
 Look at the difference in output between these functions:
 
@@ -94,7 +94,8 @@ Now, say you want to print that binary number. A 64-bit floating point number re
 
 So if 0.1 and 0.10000000000000001 both preserve the information necessary to recover the exact same binary number, why not use the shorter one when printing it?  Well, an implementation may decide that the longer representation is preferred because it should try to honor the binary value as accurately as possible. From a mathematical point of view, it seems like the natural and correct thing to do.
 
-## Conflicting requirements
+## Conflicting Requirements
+
 It should be clear at this point that there are conflicting requirements. The best strategy for printing a floating-point number likely depends on its origin. Did the number originated from a binary calculation inside the computer or was it was originally entered by a human being using base 10 decimal? If a human entered the number, an equivalent but shorter representation is more likely appropriate. If a scientist wrote code to calcuate the number, it may be that ".10000000000000001" is a more accurate representation of the real number calculated and it would be preferable to leave it that way in case it is later parsed with *higher precision*. (Although it won't parse any differently at 64-bit precision.)
 
 A general printing algorithm does not know from which source the floating-point number originated. Moreover, it is reasonable to expect that determining the shortest representation in decimal that will recover the binary number will take more work than the alternative. In fact, there are some tricky issues that can lead to close-but-not-optimal solutions [4]. It should not be surprising then that many different algorithms have been implemented over the years and implementations continue to evolve as the research into new techniques also evolves.
@@ -104,21 +105,7 @@ A general printing algorithm does not know from which source the floating-point 
 3. https://en.wikipedia.org/wiki/Double-precision_floating-point_format
 4. https://www.exploringbinary.com/the-shortest-decimal-string-that-round-trips-may-not-be-the-nearest/
 
-# The Doubleback Rationale
-
-Doubleback is opinionated in a few ways.
-
-The first opinion is that shorter representations of floating-point numbers are preferable over longer, perhaps more accurate representations, if they round-trip back to the exact same 64-bit binary number anyway. As explained in the previous section, there are users who prefer to represent binary values with extreme precision, and care less about poor ergonomics. But those users have other options. For example, they can reduce conversion error by using hexadecimal notation, binary storage, longer floating point types, or arbitrary precision libraries.
-
-There is only so much accuracy one should expect when working with 64-bit binary numbers. Moreover, if you are converting to decimal notation then that is likely for human consumption. So ergonomics seems like a reasonable bias for that operation. Python recognized the pragmatic advantage of shorter representations many years ago [1]. Chasing down some illusory extra bit of precision that will provide hardly any real benefit to all but a small minority of users (who have better options) should not be the priority.
-
-The second opinion is that %.17g has the appropriate semantics for round-trip preservation of human-entered 64-bit floating-point numbers with the appropriate number of significant digits. It should be easy to produce output in this style. Moreover, is should be easy to output like %g but without plus signs or leading zeros on exponents, as that will be even shorter.
-
-The third opinion is that Ryū is the right algorithm at the right time for implementing this solution.
-
-1. https://bugs.python.org/issue1580
-
-# What is printf %g formatting?  <a name="what-is-g"></a>
+# What is printf %g Formatting?  <a name="what-is-g"></a>
 
 ```
 printf("%.17g\n", 0.5);
@@ -176,7 +163,6 @@ A potential downside of %.17g occurs when the number of significant digits left 
 
 So %.17g ends up "right-sizing" the precision when displayed without an exponent. It tries to display as many digits as necessary to be precise, but *no more*.
 
-
 # Background on Ryu Formats
 
 Adams provided implementations for %e, %f, and "shortest". Ryū "shortest" mode is similar to %g, but it is not the same. When first learning about Ryū, one could be forgiven for mixing up Ryū's "shortest" with %g. They both can result in "right sizing" the number of significant digits while supressing trailing zeros.
@@ -208,6 +194,20 @@ As described in the previous section, the implementation of %g is not so trivial
 
 So additional work is required to implement %g formatting.
 
+# The Doubleback Rationale
+
+Doubleback is opinionated in a few ways.
+
+The first opinion is that shorter representations of floating-point numbers are preferable over longer, perhaps more accurate representations, if they round-trip back to the exact same 64-bit binary number anyway. As explained in the previous section, there are users who prefer to represent binary values with extreme precision, and care less about poor ergonomics. But those users have other options. For example, they can reduce conversion error by using hexadecimal notation, binary storage, longer floating point types, or arbitrary precision libraries.
+
+There is only so much accuracy one should expect when working with 64-bit binary numbers. Moreover, if you are converting to decimal notation then that is likely for human consumption. So ergonomics seems like a reasonable bias for that operation. Python recognized the pragmatic advantage of shorter representations many years ago [1]. Chasing down some illusory extra bit of precision that will provide hardly any real benefit to all but a small minority of users (who have better options) should not be the priority.
+
+The second opinion is that %.17g is the most reasonable and familiar representation for human-entered 64-bit floating-point numbers that preserves the maximum amount of usable precision. As will be explain in the next section, there are also a few improvements that have been adopted as well. It should be easy to produce output in this style in many different programming languages.
+
+The third opinion is that Ryū is the right algorithm at the right time for implementing this solution.
+
+1. https://bugs.python.org/issue1580
+
 # The Doubleback Format
 
 Doubleback implements its own format which is similar to "%.17g" but it is NOT intended to be an exact drop-in replacement.
@@ -227,12 +227,6 @@ char *dfmt(double value, char *buffer);
 ```
 
 To avoid memory allocation and threading complications a small memory buffer must be passed to the API. The buffer pointer is returned back for convenience.
-
-# Benchmarks
- 
-The "ergonomic magic" of "0.3" instead of ".299999999..." is awesome, but at what performance cost compared to printf %g?
-
-The benchmark Adams provided for Ryū "shortest" is against Google's double_conversion (Grisu3). We provide new benchmarks at the bottom of this page for Doubleback/Ryū dfmt vs snprintf %g vs Ryū shortest.
 
 # Why not DragonBox or other?
 
@@ -255,7 +249,11 @@ Doubleback is derived from upstream projects.
 | Java     | https://github.com/ulfjack/ryu |
 
 
-# Charts that show Doubleback/Ryū is Fast with Short Output  <a name="pretty-charts"></a>
+# Benchmarks
+ 
+The "ergonomic magic" of "0.3" instead of ".299999999..." is awesome, but at what performance cost compared to printf %g?
+
+The benchmark Adams provided for Ryū "shortest" is against Google's double_conversion (Grisu3). We provide new benchmarks at the bottom of this page for Doubleback/Ryū dfmt vs snprintf %g vs Ryū shortest.
 
 ![Doubleback/Ryū prints 10 to 20 times faster than standard printf](results/c-double-shortest-bydigits-time.png "Doubleback/Ryū ranges from 10 to 20 times faster than standard printf")
 
