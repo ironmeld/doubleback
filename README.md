@@ -1,21 +1,22 @@
 # Table of Contents
 * [Doubleback](#doubleback)
+* [What is Ryu?](#what-is-ryu)
 * [Status](#status)
 * [Roadmap for first release](#roadmap-for-first-release)
 * [Getting Started](#getting-started)
 * [The Problem with Printing Floating-Point Numbers](#the-problem-with-printing-floating-point-numbers)
 * [The Doubleback Rationale](#the-doubleback-rationale)
 * [What is printf %g formatting?](#what-is-g)
-* [Doubleback/Ryu based %g formatting](#doubleback-g)
-* [The Doubleback API](#the-doubleback-api)
+* [The Doubleback Format](#the-doubleback-format)
+* [The Doubleback APIs](#the-doubleback-apis)
 * [Benchmarks](#benchmarks)
 * [Why not DragonBox or other?](#why-not-dragonbox-or-other)
 * [Acknowledgements](#acknowledgements)
-* [Charts that show Doubleback/Ryu is Fast with Short Output](#pretty-charts)
+* [Charts that show Doubleback/Ryū is Fast with Short Output](#pretty-charts)
 
 # Doubleback
 
-Doubleback provides round-trip parsing and printing of 64-bit double-precision floating-point numbers using the Ryu algorithm implemented in multiple programming languages. Doubleback is biased towards "human-friendly" output which round-trips consistently between binary and decimal.
+Doubleback provides round-trip parsing and printing of 64-bit double-precision floating-point numbers using the Ryū algorithm implemented in multiple programming languages. Doubleback is biased towards "human-friendly" output which round-trips consistently between binary and decimal.
 
 The Doubleback project unifies code forked from various github projects. See Acknowledgements.
 
@@ -27,7 +28,7 @@ printf("%.17g", 0.3);
 0.29999999999999999
 ```
 
-Ryu shortest:
+Ryū shortest:
 ```
 char buf[32];
 d2s_buffered(0.3, buf);
@@ -44,28 +45,28 @@ printf("%s", dfmt(0.3, buf));
 
 Only dfmt formats 0.3 as "0.3".
 
-Doubleback dfmt is basically `Ryu shortest` reformatted to be like `printf("%.17g")`:
+Doubleback dfmt is basically `Ryū shortest` reformatted to be like `printf("%.17g")`:
 
-`Ryu shortest` is an algorithm along with reference code developed by Ulf Adams, Google Germany in 2018 [1][2]. Ryu supports consistent round-trip parsing and "shortest" printing of 64-bit floating-point numbers. To be clear, Ryu is the breakthrough technology that makes Doubleback possible.
+# What is Ryu?
 
-There are many older and established algorithms for printing floats. However, Ryu is in a new class of recently developed algorithms that claim substantial improvements over previous efforts.
+Ryū is an algorithm [1][2] along with reference code [3] developed by Ulf Adams, Google Germany in 2018. Ryū supports consistent round-trip parsing and "shortest" printing of 64-bit floating-point numbers. To be clear, Ryū is the breakthrough technology that makes Doubleback possible.
+
+There are many older and established algorithms for printing floats. However, Ryū is in a new class of recently developed algorithms that claim substantial improvements over previous efforts.
 
 These algorithms:
 * Produce a consistent round-trip representation for all 64-bit doubles
 * Produce the shortest length string from equivalent choices in all cases
 * Execute in a fraction of the time of previous efforts
 
-Doubleback merges forks of existing Ryu projects and modifies and enhances them to expose a consistent API. Doubleback tests APIs against each other for consistency.
-
-Doubleback implements printf %g equivalency which was not implemented previously by the reference Ryu project [3]
+Doubleback merges forks of existing Ryū projects and modifies and enhances them to expose a consistent API. Doubleback tests APIs against each other for consistency.
 
 1. https://dl.acm.org/doi/10.1145/3296979.3192369
 2. https://dl.acm.org/doi/pdf/10.1145/3360595
-3. https://github.com/ulfjack/ryu  (There is a wealth of information about Ryu in the README here.)
+3. https://github.com/ulfjack/ryu  (There is a wealth of information about Ryū in the README here.)
 
 # Status
 
-Doubleback is in development and is not ready for use or contributions.
+Doubleback is in development and is NOT READY for use or contributions.
 
 # Roadmap for first release
 
@@ -86,6 +87,7 @@ $ make
 # The Problem with Printing Floating-Point Numbers
 
 ## Rounding Errors
+
 A big limitation of binary floating-point numbers is that some base 10 numbers like 0.1 cannot be precisely converted to binary [1]. If the number 0.1 is converted to a 64-bit number then it must be rounded to the nearest binary number. The resulting number in binary form is actually 0.1000000000000000055511151231257827021181583404541015625. [2]
 
 Now, say you want to print that binary number. A 64-bit floating point number requires, at most, 17 digits in base 10 (decimal) to accurately represent the number sufficiently so that it will return the same binary number when parsed back into binary [3]. However, at seventeen digits, the binary number above rounds to 0.10000000000000001. So, technically that is the most accurate decimal representation of the binary number at 17 digits. But the critical point is that, due to the rounding error described in the previous paragraph, 0.1 will round-trip back to 0.1000000000000000055511151231257827021181583404541015625 in binary. This is the exact same binary value that 0.10000000000000001 ends up rounding to when parsed.
@@ -112,7 +114,7 @@ There is only so much accuracy one should expect when working with 64-bit binary
 
 The second opinion is that %.17g has the appropriate semantics for round-trip preservation of human-entered 64-bit floating-point numbers with the appropriate number of significant digits. It should be easy to produce output in this style. Moreover, is should be easy to output like %g but without plus signs or leading zeros on exponents, as that will be even shorter.
 
-The third opinion is that Ryu is the right algorithm at the right time for implementing this solution.
+The third opinion is that Ryū is the right algorithm at the right time for implementing this solution.
 
 1. https://bugs.python.org/issue1580
 
@@ -135,6 +137,7 @@ printf("%.17f\n", 113.166015625);
 ```
 
 ## Dynamic Notation
+
 Furthermore %g will render without exponents if the number is not too big or too small (while factoring in the requested precision) otherwise it will render with exponents.
 
 Some of the details can be found here:
@@ -173,15 +176,16 @@ A potential downside of %.17g occurs when the number of significant digits left 
 
 So %.17g ends up "right-sizing" the precision when displayed without an exponent. It tries to display as many digits as necessary to be precise, but *no more*.
 
-# Doubleback/Ryu based %g formatting  <a name="doubleback-g"></a>
 
-Adams provided implementations for %e, %f, and "shortest". Ryu "shortest" mode is similar to %g, but it is not the same. When first learning about Ryu, one could be forgiven for mixing up Ryu's "shortest" with %g. They both can result in "right sizing" the number of significant digits while supressing trailing zeros.
+# Background on Ryu Formats
 
-However, for the number "0.3" Ryu shortest outputs "3E-1" instead of "0.3". Ryu "shortest" always outputs exponential notation, which is different from %g. An explanation for this is found in this issue: https://github.com/ulfjack/ryu/issues/154.
+Adams provided implementations for %e, %f, and "shortest". Ryū "shortest" mode is similar to %g, but it is not the same. When first learning about Ryū, one could be forgiven for mixing up Ryū's "shortest" with %g. They both can result in "right sizing" the number of significant digits while supressing trailing zeros.
+
+However, for the number "0.3" Ryū shortest outputs "3E-1" instead of "0.3". Ryū "shortest" always outputs exponential notation, which is different from %g. An explanation for this is found in this issue: https://github.com/ulfjack/ryu/issues/154.
 
 I suspect there was an early intent to provide the equivalent %g functionality, as stated in the paper:
 ```
-This paper describes the Ryu Printf algorithm, which generates printf-identical output
+This paper describes the Ryū Printf algorithm, which generates printf-identical output
 for the %f, %e, and %g formats with arbitrary runtime-provided precision parameters,
 i.e., printf("%.<p>f",<f>), printf("%.<p>e",<f>), and printf("%.<p>g",<f>)
 for any precision p and floating-point value f.
@@ -204,15 +208,23 @@ As described in the previous section, the implementation of %g is not so trivial
 
 So additional work is required to implement %g formatting.
 
-# The Doubleback API
+# The Doubleback Format
 
-The "flagship" API for Doubleback in C notation is:
+Doubleback implements its own format which is similar to "%.17g" but it is NOT intended to be an exact drop-in replacement.
+
+Doubleback dfmt is different from printf("%.17g") in these ways:
+* All numbers have a decimal point or an exponent
+* It uses Ryū to pick the shortest representation
+* It does not zero-pad small exponents
+* It does not print a plus sign for positive exponents
+
+# The Doubleback APIs
+
+The API for Doubleback formatting in C notation is:
 
 ```
 char *dfmt(double value, char *buffer);
 ```
-
-This output is similar to printf("%.17g") except it is shorter in three ways: it uses Ryu to pick the shortest representation, it never zero-pads the exponent, and it does not print a plus sign for positive exponents.
 
 To avoid memory allocation and threading complications a small memory buffer must be passed to the API. The buffer pointer is returned back for convenience.
 
@@ -220,13 +232,13 @@ To avoid memory allocation and threading complications a small memory buffer mus
  
 The "ergonomic magic" of "0.3" instead of ".299999999..." is awesome, but at what performance cost compared to printf %g?
 
-The benchmark Adams provided for Ryu "shortest" is against Google's double_conversion (Grisu3). We provide new benchmarks at the bottom of this page for Doubleback/Ryu dfmt vs snprintf %g vs Ryu shortest.
+The benchmark Adams provided for Ryū "shortest" is against Google's double_conversion (Grisu3). We provide new benchmarks at the bottom of this page for Doubleback/Ryū dfmt vs snprintf %g vs Ryū shortest.
 
 # Why not DragonBox or other?
 
-The performance benefits of DragonBox [1] are compelling [2] and I was close to going all in on DragonBox instead of Ryu. However, at the time of this writing (Mar 13, 2021) DragonBox is around 6 months old and has not been peer reviewed or implemented in any language other than C++. Ryu, on the other hand, has received substantial investment in development and testing. There are implementations at various stages of development for over ten different programming languages. Microsoft developed an implementation and extensive tests for incorporation into libc++ that spans over 60,000 lines of code [3]. There is a similar effort for Go although it appears to have stalled [4].
+The performance benefits of DragonBox [1] are compelling [2] and I was close to going all in on DragonBox instead of Ryū. However, at the time of this writing (Mar 13, 2021) DragonBox is around 6 months old and has not been peer reviewed or implemented in any language other than C++. Ryū, on the other hand, has received substantial investment in development and testing. There are implementations at various stages of development for over ten different programming languages. Microsoft developed an implementation and extensive tests for incorporation into libc++ that spans over 60,000 lines of code [3]. There is a similar effort for Go although it appears to have stalled [4].
 
-I think it is likely that an algorithm different from Ryu, perhaps DragonBox, will ultimately be considered the state-of-the-art. That algorithm will likely be functionally equivalent and could be a compelling candidate to replace Ryu in the future. But for now, the next-gen floating-point boat has already departed and Ryu is on it.
+I think it is likely that an algorithm different from Ryū, perhaps DragonBox, will ultimately be considered the state-of-the-art. That algorithm will likely be functionally equivalent and could be a compelling candidate to replace Ryū in the future. But for now, the next-gen floating-point boat has already departed and Ryū is on it.
 
 1. https://github.com/jk-jeon/dragonbox
 2. https://github.com/abolz/Drachennest/
@@ -243,10 +255,10 @@ Doubleback is derived from upstream projects.
 | Java     | https://github.com/ulfjack/ryu |
 
 
-# Charts that show Doubleback/Ryu is Fast with Short Output  <a name="pretty-charts"></a>
+# Charts that show Doubleback/Ryū is Fast with Short Output  <a name="pretty-charts"></a>
 
-![Doubleback/Ryu prints 10 to 20 times faster than standard printf](results/c-double-shortest-bydigits-time.png "Doubleback/Ryu ranges from 10 to 20 times faster than standard printf")
+![Doubleback/Ryū prints 10 to 20 times faster than standard printf](results/c-double-shortest-bydigits-time.png "Doubleback/Ryū ranges from 10 to 20 times faster than standard printf")
 
-![Doubleback/Ryu output is 30% to 96% the length of standard printf](results/c-double-shortest-bydigits-length.png "Doubleback/Ryu output is 30% to 96% the length of standard printf")
+![Doubleback/Ryū output is 30% to 96% the length of standard printf](results/c-double-shortest-bydigits-length.png "Doubleback/Ryū output is 30% to 96% the length of standard printf")
 
-![Doubleback/Ryu parses approx. 3 to 7 times faster than standard strtod](results/c-double-shortest-bydigits-parse.png "Doubleback/Ryu ranges from approx. 3 to 7 times faster than standard strtod")
+![Doubleback/Ryū parses approx. 3 to 7 times faster than standard strtod](results/c-double-shortest-bydigits-parse.png "Doubleback/Ryū ranges from approx. 3 to 7 times faster than standard strtod")
