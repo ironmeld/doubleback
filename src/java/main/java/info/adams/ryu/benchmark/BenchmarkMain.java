@@ -124,7 +124,7 @@ public class BenchmarkMain {
         System.gc();
         start = System.nanoTime();
         for (int j = 0; j < iterations; j++) {
-          f = Double.parseDouble(input);
+          f = RyuDouble.dparse(input);
           throwaway_f += f;
         }
         stop = System.nanoTime();

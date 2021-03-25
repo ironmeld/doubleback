@@ -90,7 +90,7 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   tools = ["shortest-parse.template"],
   outs = [lang + "-double-shortest-bydigits-parse.pdf"],
   cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-parse", lang, s1, s2, s3, s4),
-) for (lang,s1,s2,s3,s4) in [("java","jdk","jdk","","")]
+) for (lang,s1,s2,s3,s4) in [("java","jdk","dparse","","")]
 ]
 
 [genrule(
@@ -99,5 +99,5 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   tools = ["shortest-parse-png.template"],
   outs = [lang + "-double-shortest-bydigits-parse.png"],
   cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-parse-png", lang, s1, s2, s3, s4),
-) for (lang,s1,s2,s3,s4) in [("java","jdk","jdk","","")]
+) for (lang,s1,s2,s3,s4) in [("java","jdk","dparse","","")]
 ]

@@ -23,10 +23,11 @@ class DfmtEcho {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String nextValue;
         while ((nextValue = br.readLine()) != null) {
-            if (RyuDouble.isValid(nextValue)) {
-                double f = Double.parseDouble(nextValue);
+            try {
+                double f = RyuDouble.dparse(nextValue);
                 System.out.println(RyuDouble.dfmt(f));
-                    } else {
+            }
+            catch (IllegalArgumentException e) {
                 System.out.println("ERROR");
             }
         }
