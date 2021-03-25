@@ -29,7 +29,6 @@
 #endif
 
 #include "ryu/common.h"
-#include "ryu/d2s_intrinsics.h"
 
 #if defined(RYU_OPTIMIZE_SIZE)
 #include "ryu/d2s_small_table.h"
