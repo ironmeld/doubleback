@@ -451,63 +451,6 @@ static inline bool d2d_small_int(const uint64_t ieeeMantissa, const uint32_t iee
   return true;
 }
 
-int d2s_buffered_n(double f, char* result) {
-  // Step 1: Decode the floating-point number, and unify normalized and subnormal cases.
-  const uint64_t bits = double_to_bits(f);
-
-#ifdef RYU_DEBUG
-  printf("IN=");
-  for (int32_t bit = 63; bit >= 0; --bit) {
-    printf("%d", (int) ((bits >> bit) & 1));
-  }
-  printf("\n");
-#endif
-
-  // Decode bits into sign, mantissa, and exponent.
-  const bool ieeeSign = ((bits >> (DOUBLE_MANTISSA_BITS + DOUBLE_EXPONENT_BITS)) & 1) != 0;
-  const uint64_t ieeeMantissa = bits & ((1ull << DOUBLE_MANTISSA_BITS) - 1);
-  const uint32_t ieeeExponent = (uint32_t) ((bits >> DOUBLE_MANTISSA_BITS) & ((1u << DOUBLE_EXPONENT_BITS) - 1));
-  // Case distinction; exit early for the easy cases.
-  if (ieeeExponent == ((1u << DOUBLE_EXPONENT_BITS) - 1u) || (ieeeExponent == 0 && ieeeMantissa == 0)) {
-    return copy_special_str(result, ieeeSign, ieeeExponent, ieeeMantissa);
-  }
-
-  floating_decimal_64 v;
-  const bool isSmallInt = d2d_small_int(ieeeMantissa, ieeeExponent, &v);
-  if (isSmallInt) {
-    // For small integers in the range [1, 2^53), v.mantissa might contain trailing (decimal) zeros.
-    // For scientific notation we need to move these zeros into the exponent.
-    // (This is not needed for fixed-point notation, so it might be beneficial to trim
-    // trailing zeros in to_chars only if needed - once fixed-point notation output is implemented.)
-    for (;;) {
-      const uint64_t q = div10(v.mantissa);
-      const uint32_t r = ((uint32_t) v.mantissa) - 10 * ((uint32_t) q);
-      if (r != 0) {
-        break;
-      }
-      v.mantissa = q;
-      ++v.exponent;
-    }
-  } else {
-    v = d2d(ieeeMantissa, ieeeExponent);
-  }
-
-  return to_chars(v, ieeeSign, result, 'E');
-}
-
-void d2s_buffered(double f, char* result) {
-  const int index = d2s_buffered_n(f, result);
-
-  // Terminate the string.
-  result[index] = '\0';
-}
-
-char* d2s(double f) {
-  char* const result = (char*) malloc(25);
-  d2s_buffered(f, result);
-  return result;
-}
-
 static inline int copy_special_str_dfmt(char * const result, const bool sign, const bool exponent, const bool mantissa) {
   if (mantissa) {
     memcpy(result, "NaN", 3);
@@ -645,7 +588,7 @@ int dfmt_n(double d, char* result) {
   return len;
 }
 
-char *dfmt(double d, char* result) {
+char *dfmt(const double d, char* result) {
   const int index = dfmt_n(d, result);
 
   // Terminate the string.

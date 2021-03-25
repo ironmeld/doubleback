@@ -20,7 +20,6 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
     "  | sed \"s|LANGUAGE|%s|g\"",
     "  | sed \"s|SERIES1|%s|g\"",
     "  | sed \"s|SERIES2|%s|g\"",
-    "  | sed \"s|SERIES3|%s|g\"",
     "  > $${TMP_FILE}",
     " && gnuplot $${TMP_FILE} > $@",
     " && rm -f $${TMP_FILE}"])
@@ -31,8 +30,8 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   srcs = [lang + "-double-shortest-64bit-data.csv"],
   tools = ["shortest.template"],
   outs = [lang + "-double-shortest-64bit-data.pdf"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest", lang, s1, s2, s3),
-) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest", lang, s1, s2),
+) for (lang,s1,s2) in [("c","snprintf %.17g","Doubleback dfmt")]
 ]
 
 # Generate stats using doubles grouped by number of digits
@@ -52,8 +51,8 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   srcs = [lang + "-double-shortest-bydigits-summary.csv"],
   tools = ["shortest-time.template"],
   outs = [lang + "-double-shortest-bydigits-time.pdf"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-time", lang, s1, s2, s3),
-) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-time", lang, s1, s2),
+) for (lang,s1,s2) in [("c","snprintf %.17g","Doubleback dfmt")]
 ]
 
 [genrule(
@@ -61,8 +60,8 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   srcs = [lang + "-double-shortest-bydigits-summary.csv"],
   tools = ["shortest-time-png.template"],
   outs = [lang + "-double-shortest-bydigits-time.png"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-time-png", lang, s1, s2, s3),
-) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-time-png", lang, s1, s2),
+) for (lang,s1,s2) in [("c","snprintf %.17g","Doubleback dfmt")]
 ]
 
 [genrule(
@@ -70,8 +69,8 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   srcs = [lang + "-double-shortest-bydigits-summary.csv"],
   tools = ["shortest-length.template"],
   outs = [lang + "-double-shortest-bydigits-length.pdf"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-length", lang, s1, s2, s3),
-) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-length", lang, s1, s2),
+) for (lang,s1,s2) in [("c","snprintf %.17g","Doubleback dfmt")]
 ]
 
 [genrule(
@@ -79,8 +78,8 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   srcs = [lang + "-double-shortest-bydigits-summary.csv"],
   tools = ["shortest-length-png.template"],
   outs = [lang + "-double-shortest-bydigits-length.png"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-length-png", lang, s1, s2, s3),
-) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-length-png", lang, s1, s2),
+) for (lang,s1,s2) in [("c","snprintf %.17g","Doubleback dfmt")]
 ]
 
 [genrule(
@@ -88,8 +87,8 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   srcs = [lang + "-double-shortest-bydigits-summary.csv"],
   tools = ["shortest-parse.template"],
   outs = [lang + "-double-shortest-bydigits-parse.pdf"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-parse", lang, s1, s2, s3),
-) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-parse", lang, s1, s2),
+) for (lang,s1,s2) in [("c","snprintf %.17g","Doubleback dfmt")]
 ]
 
 [genrule(
@@ -97,6 +96,6 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   srcs = [lang + "-double-shortest-bydigits-summary.csv"],
   tools = ["shortest-parse-png.template"],
   outs = [lang + "-double-shortest-bydigits-parse.png"],
-  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-parse-png", lang, s1, s2, s3),
-) for (lang,s1,s2,s3) in [("c","snprintf %.17g","Ryū shortest","Doubleback dfmt")]
+  cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-parse-png", lang, s1, s2),
+) for (lang,s1,s2) in [("c","snprintf %.17g","Doubleback dfmt")]
 ]

@@ -22,17 +22,17 @@ set xlabel "Precision of Input Number"
 set xrange [0:18]
 set xtics 1, 1, 17
 
-set key center center
+set key left center
 
 # Line Colors
 set style line 1 lc rgb '#cb1a0e' lt 1 lw 2  # red
 set style line 2 lc rgb '#334c87' lt 1 lw 2  # blue
 set style line 3 lc rgb '#5e9c36' lt 1 lw 2  # green not used
 
-plot "INPUT_FILE" using 1:14:15 ls 1 pt 5 ps 1 title 'SERIES1' with yerrorbars,\
-     "INPUT_FILE" using 1:14:(sprintf("%.0f",$14)) ls 1 pt 5 ps 1 with labels offset 1.4,0.5 font ",9" notitle,\
-     "INPUT_FILE" using 1:14 ls 1 smooth csplines notitle,\
+plot "INPUT_FILE" using 1:10:11 ls 1 pt 5 ps 1 title 'SERIES1' with yerrorbars,\
+     "INPUT_FILE" using 1:10:(sprintf("%.0f",$10)) ls 1 pt 5 ps 1 with labels offset 1.4,0.5 font ",9" notitle,\
+     "INPUT_FILE" using 1:10 ls 1 smooth csplines notitle,\
 \
-     "INPUT_FILE" using 1:16:17 ls 2 pt 7 ps 1 title 'SERIES2' with yerrorbars,\
-     "INPUT_FILE" using 1:16 :(sprintf("%.0f",$16 )) ls 2 pt 5 ps 1 with labels offset 1.4,0.5 font ",9" notitle,\
-     "INPUT_FILE" using 1:16 ls 2 smooth csplines notitle
+     "INPUT_FILE" using 1:12:13 ls 2 pt 7 ps 1 title 'SERIES2' with yerrorbars,\
+     "INPUT_FILE" using 1:12:(sprintf("%.0f",$12)) ls 2 pt 5 ps 1 with labels offset 1.4,0.5 font ",9" notitle,\
+     "INPUT_FILE" using 1:12 ls 2 smooth csplines notitle

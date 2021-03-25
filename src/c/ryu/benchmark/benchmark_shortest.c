@@ -84,7 +84,6 @@ double generate_double(uint64_t* r) {
 
 static int bench64_general(const uint32_t samples, const uint32_t iterations, const bool data, const bool csv) {
   char input[BUFFER_SIZE];
-  char buffer_d2s[BUFFER_SIZE];
   char buffer_dfmt[BUFFER_SIZE];
   char buffer_snprintf[BUFFER_SIZE];
   int precision = 0;
@@ -93,10 +92,6 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
   float throwaway_f = 0.0;
 
   RandomInit(12345);
-  mean_and_variance d2s_time_mv;
-  init(&d2s_time_mv);
-  mean_and_variance d2s_len_mv;
-  init(&d2s_len_mv);
   mean_and_variance snp_time_mv;
   init(&snp_time_mv);
   mean_and_variance snp_len_mv;
@@ -107,26 +102,24 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
   init(&dfmt_len_mv);
   mean_and_variance strtod_time_mv;
   init(&strtod_time_mv);
-  mean_and_variance s2d_time_mv;
-  init(&s2d_time_mv);
+  mean_and_variance dparse_time_mv;
+  init(&dparse_time_mv);
 
   if (data) {
     if (csv) {
-      printf("intval,snprintf,snp_time,snp_length,d2s,d2s_time,d2s_len,dfmt_time,dfmt_len,strtod_time,d2s_time\n");
+      printf("intval,snprintf,snp_time,snp_length,dfmt_time,dfmt_len,strtod_time,dparse_time\n");
     }
   } else {
     if (csv) {
       printf("digits," \
              "snp_time_avg,snp_time_stdev,snp_len_avg,snp_len_stddev," \
-             "d2s_time_avg,d2s_time_stddev,d2s_len_avg,d2s_len_stddev," \
              "dfmt_time_avg,dfmt_time_stddev,dfmt_len_avg,dfmt_len_stddev," \
-             "strtod_time_avg,strtod_time_stddev,s2d_time,s2d_time_stddev\n");
+             "strtod_time_avg,strtod_time_stddev,dparse_time,dparse_time_stddev\n");
     } else {
-      printf("%7s %7s %7s %7s %7s %7s %7s %7s %7s %7s %7s %7s %7s%8s %7s %7s %7s\n",
+      printf("%7s %7s %7s %7s %7s %7s %7s %7s %7s %7s %7s %7s %7s\n",
              "digits", "libc ns", "stddev", "libc len", "stddev",
-                       "d2s ns", "stddev", "d2s len", "stddev",
                        "dfmt ns", "stddev", "dfmtLen", "stddev",
-                       "strtod", "stddev", "s2d ns", "stddev");
+                       "strtod", "stddev", "dparse", "stddev");
     }
   }
 
@@ -135,14 +128,12 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
     // "bydigits" needs to reset on every change in digits of precision
     // but "data" does not
     if (!data) {
-       init(&d2s_time_mv);
-       init(&d2s_len_mv);
        init(&snp_time_mv);
        init(&snp_len_mv);
        init(&dfmt_time_mv);
        init(&dfmt_len_mv);
        init(&strtod_time_mv);
-       init(&s2d_time_mv);
+       init(&dparse_time_mv);
     }
 
     for (int i = 0; i < samples; ++i) {
@@ -163,25 +154,15 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
       double strtod_time = ((t2 - t1) * 1000000000.0) / ((double) iterations) / ((double) CLOCKS_PER_SEC);
       update(&strtod_time_mv, strtod_time);
 
-      // test s2d
+      // test dparse
       t1 = clock();
       for (int j = 0; j < iterations; ++j) {
-          s2d(input, &f);
+          dparse(input, &f);
           throwaway_f += f;
       }
       t2 = clock();
-      double s2d_time = ((t2 - t1) * 1000000000.0) / ((double) iterations) / ((double) CLOCKS_PER_SEC);
-      update(&s2d_time_mv, s2d_time);
-
-      t1 = clock();
-      for (int j = 0; j < iterations; ++j) {
-        d2s_buffered(f, buffer_d2s);
-        throwaway += buffer_d2s[2];
-      }
-      t2 = clock();
-      double d2s_time = ((t2 - t1) * 1000000000.0) / ((double) iterations) / ((double) CLOCKS_PER_SEC);
-      update(&d2s_time_mv, d2s_time);
-      update(&d2s_len_mv, (double) strlen(buffer_d2s));
+      double dparse_time = ((t2 - t1) * 1000000000.0) / ((double) iterations) / ((double) CLOCKS_PER_SEC);
+      update(&dparse_time_mv, dparse_time);
 
       t1 = clock();
       for (int j = 0; j < iterations; ++j) {
@@ -204,11 +185,10 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
       update(&dfmt_len_mv, (double) strlen(buffer_dfmt));
 
       if (data && csv) {
-        printf("%" PRIu64 ",%s,%f,%f,%s,%f,%f,%s,%f,%f,%f,%f\n", r,
+        printf("%" PRIu64 ",%s,%f,%f,%s,%f,%f,%f,%f\n", r,
             buffer_snprintf, snp_time, (double) strlen(buffer_snprintf),
-            buffer_d2s, d2s_time, (double) strlen(buffer_d2s),
             buffer_dfmt, dfmt_time, (double) strlen(buffer_dfmt),
-            strtod_time, s2d_time);
+            strtod_time, dparse_time);
       }
     }
     // summary stats by digits of precision
@@ -217,22 +197,18 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
           printf("%d,", precision);
           printf("%.3f,%.3f,", snp_time_mv.mean, stddev(&snp_time_mv));
           printf("%.3f,%.3f,", snp_len_mv.mean, stddev(&snp_len_mv));
-          printf("%.3f,%.3f,", d2s_time_mv.mean, stddev(&d2s_time_mv));
-          printf("%.3f,%.3f,", d2s_len_mv.mean, stddev(&d2s_len_mv));
           printf("%.3f,%.3f,", dfmt_time_mv.mean, stddev(&dfmt_time_mv));
           printf("%.3f,%.3f,", dfmt_len_mv.mean, stddev(&dfmt_len_mv));
           printf("%.3f,%.3f,", strtod_time_mv.mean, stddev(&strtod_time_mv));
-          printf("%.3f,%.3f", s2d_time_mv.mean, stddev(&s2d_time_mv));
+          printf("%.3f,%.3f", dparse_time_mv.mean, stddev(&dparse_time_mv));
         } else {
           printf("%8d", precision);
           printf(" %7.2f ±%-6.2f", snp_time_mv.mean, stddev(&snp_time_mv));
           printf(" %7.2f ±%-6.2f", snp_len_mv.mean, stddev(&snp_len_mv));
-          printf(" %7.2f ±%-6.2f", d2s_time_mv.mean, stddev(&d2s_time_mv));
-          printf(" %7.2f ±%-6.2f", d2s_len_mv.mean, stddev(&d2s_len_mv));
           printf(" %7.2f ±%-6.2f", dfmt_time_mv.mean, stddev(&dfmt_time_mv));
           printf(" %7.2f ±%-6.2f", dfmt_len_mv.mean, stddev(&dfmt_len_mv));
           printf(" %7.2f ±%-6.2f", strtod_time_mv.mean, stddev(&strtod_time_mv));
-          printf(" %7.2f ±%-6.2f", s2d_time_mv.mean, stddev(&s2d_time_mv));
+          printf(" %7.2f ±%-6.2f", dparse_time_mv.mean, stddev(&dparse_time_mv));
         }
         printf("\n");
     }
@@ -241,21 +217,19 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
   if (data && !csv) {
     printf("Print Time in ns:\n");
     printf(" %-20s: %7.2f ±%-.2f\n", "libc snprintf %.17g", snp_time_mv.mean, stddev(&snp_time_mv));
-    printf(" %-20s: %7.2f ±%-.2f\n", "Ryu d2s", d2s_time_mv.mean, stddev(&d2s_time_mv));
     printf(" %-20s: %7.2f ±%-.2f\n", "Doubleback dfmt", dfmt_time_mv.mean, stddev(&dfmt_time_mv));
 
     printf("\nLength in characters:\n");
     printf(" %-20s: %7.2f ±%-.2f\n", "libc snprintf %.17g", snp_len_mv.mean, stddev(&snp_len_mv));
-    printf(" %-20s: %7.2f ±%-.2f\n", "Ryu d2s", d2s_len_mv.mean, stddev(&d2s_len_mv));
     printf(" %-20s: %7.2f ±%-.2f\n", "Doubleback dfmt", dfmt_len_mv.mean, stddev(&dfmt_len_mv));
 
     printf("\ndfmt prints %.3f TIMES FASTER than printf!\n", snp_time_mv.mean / dfmt_time_mv.mean);
 
     printf("\nParse Time: \n");
     printf(" %7s: %7.2f ±%-.2f\n", "strtod", strtod_time_mv.mean, stddev(&strtod_time_mv));
-    printf(" %7s: %7.2f ±%-.2f\n", "Ryu s2d", s2d_time_mv.mean, stddev(&s2d_time_mv));
+    printf(" %7s: %7.2f ±%-.2f\n", "dparse", dparse_time_mv.mean, stddev(&dparse_time_mv));
 
-    printf("\ns2d parses %.3f TIMES FASTER than strtod!\n", strtod_time_mv.mean / s2d_time_mv.mean);
+    printf("\ndparse parses %.3f TIMES FASTER than strtod!\n", strtod_time_mv.mean / dparse_time_mv.mean);
   }
   return throwaway + (int) throwaway_f;
 }

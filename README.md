@@ -223,10 +223,19 @@ Doubleback dfmt is different from printf("%.17g") in these ways:
 The API for Doubleback formatting in C notation is:
 
 ```
-char *dfmt(double value, char *buffer);
+char *dfmt(const double input_value, char *output_buffer);
 ```
 
 To avoid memory allocation and threading complications a small memory buffer must be passed to the API. The buffer pointer is returned back for convenience.
+
+```
+enum Status dparse(const char *input_buffer, double *output_value);
+```
+
+# Language Support
+
+* C99
+* Java 8
 
 # Why not DragonBox or other?
 

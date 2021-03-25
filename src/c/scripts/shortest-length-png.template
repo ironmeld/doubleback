@@ -29,13 +29,10 @@ set key right center
 # Line Colors
 set style line 1 lc rgb '#cb1a0e' lt 1 lw 2  # red
 set style line 2 lc rgb '#334c87' lt 1 lw 2  # blue
-set style line 3 lc rgb '#5e9c36' lt 1 lw 2  # green
+set style line 3 lc rgb '#5e9c36' lt 1 lw 2  # green not used
 
 plot "INPUT_FILE" using 1:4:5 ls 1 pt 5 ps 1 title 'SERIES1' with yerrorbars,\
      "INPUT_FILE" using 1:4 ls 1 smooth csplines notitle,\
 \
      "INPUT_FILE" using 1:8:9 ls 2 pt 7 ps 1 title 'SERIES2' with yerrorbars,\
-     "INPUT_FILE" using 1:8 ls 2 smooth csplines notitle,\
-\
-     "INPUT_FILE" using ($1+.2):12:13 ls 3 pt 7 ps 1 title 'SERIES3' with yerrorbars,\
-     "INPUT_FILE" using ($1+.2):12 ls 3 smooth csplines notitle
+     "INPUT_FILE" using 1:8 ls 2 smooth csplines notitle
