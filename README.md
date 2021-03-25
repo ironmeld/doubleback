@@ -70,9 +70,9 @@ Doubleback is in development and is NOT READY for use or contributions.
 
 # Roadmap for first release
 
-* C dparse
-* C Rountrip tests
-* Java
+* c rountrip tests
+* Remove extraneous code
+* Dev Documentation
 
 # Getting Started
 
@@ -81,7 +81,7 @@ There are a number of dependencies for building Doubleback. See the [build docum
 ```
 $ git clone https://github.com/ironmeld/doubleback
 $ cd doubleback
-$ make
+$ make && make test && make benchmark
 ```
 
 # The Problem with Printing Floating-Point Numbers
