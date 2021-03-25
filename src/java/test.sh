@@ -14,3 +14,5 @@ if [ "$TRAVIS_OS_NAME" != "windows" ]; then
     diff "$DFMT_TEST_EXPECTED" test.out
     rm -f test.out
 fi
+printf "%s\n" "Exiting tests successfully"
+exit 0
