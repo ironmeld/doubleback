@@ -4,7 +4,10 @@ all:
 test:
 	make -C src test
 
+benchmark:
+	make -C src benchmark
+
 clean:
 	make -C src clean
 
-.PHONY: all test clean
+.PHONY: all test benchmark clean

@@ -1,15 +1,13 @@
 all:
-	./build-all.sh
-
-DFMT_TEST_INPUT ?= ../test-input.csv
-DFMT_TEST_EXPECTED ?= ../test-expected.csv
+	./build.sh
 
 test:
-	@cat $(DFMT_TEST_INPUT) | bazel run -c opt //ryu/tests:dfmt_echo -- > test.out
-	@diff $(DFMT_TEST_EXPECTED) test.out
-	@rm -f test.out
+	./test.sh
 
-# for manual testing
+benchmark:
+	./benchmark.sh
+
+# this parses doubles, one per line, and prints them using dfmt
 run-echo:
 	@bazel run -c opt //ryu/tests:dfmt_echo --
 
@@ -18,4 +16,4 @@ clean:
 	rm -rf bazel-*
 	rm -rf ~/.cache/bazel
 
-.PHONY: all
+.PHONY: all test benchmark run-echo clean

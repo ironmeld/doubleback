@@ -16,7 +16,7 @@ for subdir in ./*; do
   # support sparse checkouts by only testing what is present
   if [ -d "$subdir" ]; then
     set +u   # allow undefined travis var
-    if [ "$TRAVIS_OS_NAME" = "windows" -a "$subdir" = "./java" ]; then
+    if [ "$TRAVIS_OS_NAME" = "windows" ] && [ "$subdir" = "./java" ]; then
       printf "%s\n" "INFO: Skipping java on windows"
       continue
     fi
@@ -24,10 +24,10 @@ for subdir in ./*; do
 
     if [ ! -f "$EXPECTED_FILE" ]; then
         printf "Generating expected output using %s\n" "$subdir"
-        cat "$INPUT_FILE" | make -C "$subdir" run-echo | grep -v "directory" > "$EXPECTED_FILE" 2> /dev/null
+        < "$INPUT_FILE" make -C "$subdir" run-echo | grep -v "directory" > "$EXPECTED_FILE" 2> /dev/null
     else
         printf "Verifying that %s produces the same output...\n" "$subdir"
-        cat "$INPUT_FILE" | make -C "$subdir" run-echo | grep -v "directory" > "$OUTPUT_FILE" 2> /dev/null
+        < "$INPUT_FILE" make -C "$subdir" run-echo | grep -v "directory" > "$OUTPUT_FILE" 2> /dev/null
         diff "$EXPECTED_FILE" "$OUTPUT_FILE"
     fi
   fi

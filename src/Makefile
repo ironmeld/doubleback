@@ -1,18 +1,17 @@
 all:
-	./build-subdirs.sh all
-
+	./build.sh
 
 gendoubles: gendoubles.c
 	gcc gendoubles.c -o gendoubles
 
 test: gendoubles
-	# run tests in each subdir
-	./build-subdirs.sh test
-	# test output of each subdir against each other
-	./test-doubles.sh
+	./test.sh
+
+benchmark:
+	./benchmark.sh
 
 clean:
 	rm -f gendoubles
-	./build-subdirs.sh clean
+	./clean.sh
 
-.PHONY: all test clean
+.PHONY: all test benchmark clean
