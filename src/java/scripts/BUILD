@@ -5,9 +5,9 @@
   name = lang + "-double-shortest-64bit-data-csv",
   tools = [dep],
   outs = [lang + "-double-shortest-64bit-data.csv"],
-  cmd = "$(location " + dep + ") -data -csv -samples=50 > $@",
+  cmd = "$(location " + dep + ") -data -csv -samples=25 > $@",
 ) for (lang,dep) in [
-    ("java", "//test/java/info/adams/ryu/benchmark"),
+    ("java", "//testsrc/com/ironmeld/doubleback/benchmark"),
   ]
 ]
 
@@ -41,9 +41,9 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   name = lang + "-double-shortest-bydigits-summary-csv",
   tools = [dep],
   outs = [lang + "-double-shortest-bydigits-summary.csv"],
-  cmd = "$(location " + dep + ") -csv -samples=50 > $@",
+  cmd = "$(location " + dep + ") -csv -samples=25 > $@",
 ) for (lang,dep) in [
-    ("java", "//test/java/info/adams/ryu/benchmark"),
+    ("java", "//testsrc/com/ironmeld/doubleback/benchmark"),
   ]
 ]
 

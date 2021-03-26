@@ -6,7 +6,7 @@ test:
 
 # This parses doubles, one per line, and prints them using dfmt.
 run-echo:
-	@bazel run -c opt //test/java/info/adams/ryu:dfmtecho --
+	@bazel run -c opt //testsrc/com/ironmeld/doubleback:dfmtecho --
 
 benchmark:
 	./benchmark.sh
