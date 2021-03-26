@@ -9,7 +9,7 @@ benchmark:
 
 # this parses doubles, one per line, and prints them using dfmt
 run-echo:
-	@bazel run -c opt //doubleback/tests:dfmt_echo --
+	@bazel run -c opt //tests:dfmt_echo --
 
 # WARNING: deletes bazel cache which may affect other projects
 clean:

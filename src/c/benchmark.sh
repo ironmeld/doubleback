@@ -4,10 +4,10 @@
 fmt="\nBENCHMARKING with %s\n"
 
 printf "$fmt" "Uncompressed tables and 128-bit types allowed"
-bazel run -c opt //doubleback/benchmark:ryu_benchmark_shortest -- -samples=250
-bazel run -c opt //doubleback/benchmark:ryu_benchmark_shortest -- -data -samples=250
+bazel run -c opt //benchmark:ryu_benchmark_shortest -- -samples=250
+bazel run -c opt //benchmark:ryu_benchmark_shortest -- -data -samples=250
 
-TARGET=(//doubleback/benchmark:ryu_benchmark_shortest -- -data "-samples=100")
+TARGET=(//benchmark:ryu_benchmark_shortest -- -data "-samples=100")
 
 printf "$fmt" "64-bit only, 128-bit types not allowed"
 bazel run -c opt --copt=-DRYU_ONLY_64_BIT_OPS "${TARGET[@]}"
