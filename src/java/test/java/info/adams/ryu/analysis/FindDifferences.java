@@ -20,7 +20,7 @@ import org.yuanheng.cookjson.DoubleUtils;
 
 import info.adams.random.MersenneTwister;
 import info.adams.ryu.RoundingMode;
-import info.adams.ryu.RyuDouble;
+import info.adams.ryu.Doubleback;
 
 /**
  * A few tests to check that {@link DoubleUtils} isn't completely broken.
@@ -75,7 +75,7 @@ public class FindDifferences {
         continue;
       }
       String a = DoubleUtils.toString(value);
-      String b = RyuDouble.doubleToString(value, RoundingMode.ROUND_EVEN);
+      String b = Doubleback.doubleToString(value, RoundingMode.ROUND_EVEN);
       if (a.length() > b.length()) {
         if (toolong < 20 || mode == Mode.CSV) {
           // Only print the first 20.
@@ -100,7 +100,7 @@ public class FindDifferences {
 //        continue;
 //      }
       // We're nice and compare with the CONSERVATIVE rounding mode here.
-      String b = RyuDouble.doubleToString(value, RoundingMode.CONSERVATIVE);
+      String b = Doubleback.doubleToString(value, RoundingMode.CONSERVATIVE);
       if (a.length() > b.length()) {
         if (toolong < 20 || mode == Mode.CSV) {
           // Only print the first 20.

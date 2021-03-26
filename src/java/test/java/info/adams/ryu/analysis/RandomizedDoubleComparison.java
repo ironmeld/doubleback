@@ -15,7 +15,7 @@
 package info.adams.ryu.analysis;
 
 import info.adams.random.MersenneTwister;
-import info.adams.ryu.RyuDouble;
+import info.adams.ryu.Doubleback;
 
 /**
  * Pseud-randomized tests the fast implementation of Ryu against the slow one.
@@ -31,7 +31,7 @@ public class RandomizedDoubleComparison {
     for (int i = 0; i < 10000000; i++) {
       long r = twister.nextLong();
       double d = Double.longBitsToDouble(r);
-      String expected = RyuDouble.doubleToString(d);
+      String expected = Doubleback.doubleToString(d);
       String actual = SlowConversion.doubleToString(d);
       if (!expected.equals(actual)) {
         System.out.println(String.format("expected %s, but was %s", expected, actual));

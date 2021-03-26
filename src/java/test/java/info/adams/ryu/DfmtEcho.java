@@ -24,8 +24,8 @@ class DfmtEcho {
         String nextValue;
         while ((nextValue = br.readLine()) != null) {
             try {
-                double f = RyuDouble.dparse(nextValue);
-                System.out.println(RyuDouble.dfmt(f));
+                double f = Doubleback.dparse(nextValue);
+                System.out.println(Doubleback.dfmt(f));
             }
             catch (IllegalArgumentException e) {
                 System.out.println("ERROR");

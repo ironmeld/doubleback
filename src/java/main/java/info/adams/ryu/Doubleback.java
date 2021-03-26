@@ -19,7 +19,7 @@ import java.math.BigInteger;
 /**
  * An implementation of Ryu for double.
  */
-public final class RyuDouble {
+public final class Doubleback {
   private static boolean DEBUG = false;
 
   private static final int DOUBLE_MANTISSA_BITS = 52;

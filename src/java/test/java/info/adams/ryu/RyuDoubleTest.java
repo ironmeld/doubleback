@@ -21,6 +21,6 @@ import org.junit.runners.JUnit4;
 public class RyuDoubleTest extends DoubleToStringTest {
   @Override
   String f(double f, RoundingMode roundingMode) {
-    return RyuDouble.doubleToString(f, roundingMode);
+    return Doubleback.doubleToString(f, roundingMode);
   }
 }

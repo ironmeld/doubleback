@@ -17,8 +17,7 @@ package info.adams.ryu.benchmark;
 import org.yuanheng.cookjson.DoubleUtils;
 
 import info.adams.random.MersenneTwister;
-import info.adams.ryu.RyuDouble;
-import info.adams.ryu.RyuFloat;
+import info.adams.ryu.Doubleback;
 
 public class BenchmarkMain {
   public static void main(String[] args) {
@@ -67,7 +66,7 @@ public class BenchmarkMain {
       double f = Double.longBitsToDouble(r);
       long start = System.nanoTime();
       for (int j = 0; j < 100; j++) {
-        throwaway += RyuDouble.doubleToString(f).length();
+        throwaway += Doubleback.doubleToString(f).length();
       }
       for (int j = 0; j < 100; j++) {
         throwaway += Double.toString(f).length();
@@ -124,7 +123,7 @@ public class BenchmarkMain {
         System.gc();
         start = System.nanoTime();
         for (int j = 0; j < iterations; j++) {
-          f = RyuDouble.dparse(input);
+          f = Doubleback.dparse(input);
           throwaway_f += f;
         }
         stop = System.nanoTime();
@@ -143,30 +142,30 @@ public class BenchmarkMain {
         jaffer_time_mv.update(jaffer_time);
         jaffer_len_mv.update(DoubleUtils.toString(f).length());
 
-        // RyuDouble.doubleToString
+        // Doubleback.doubleToString
         double d2s_len = 0.0;
         System.gc();
         System.gc();
         start = System.nanoTime();
         for (int j = 0; j < iterations; j++) {
-          throwaway += RyuDouble.doubleToString(f).length();
+          throwaway += Doubleback.doubleToString(f).length();
         }
         stop = System.nanoTime();
         double d2s_time = (stop - start) / (double) iterations;
         d2s_time_mv.update(d2s_time);
-        d2s_len_mv.update(RyuDouble.doubleToString(f).length());
+        d2s_len_mv.update(Doubleback.doubleToString(f).length());
 
         // Doubleback.dfmt
         System.gc();
         System.gc();
         start = System.nanoTime();
         for (int j = 0; j < iterations; j++) {
-          throwaway += RyuDouble.doubleToString(f).length();
+          throwaway += Doubleback.dfmt(f).length();
         }
         stop = System.nanoTime();
         double dfmt_time = (stop - start) / (double) iterations;
         dfmt_time_mv.update(dfmt_time - 30);
-        dfmt_len_mv.update(RyuDouble.doubleToString(f).length());
+        dfmt_len_mv.update(Doubleback.dfmt(f).length());
 
         // Double.toString
         System.gc();
@@ -194,14 +193,14 @@ public class BenchmarkMain {
               Double.valueOf(DoubleUtils.toString(f).length()));
 
           System.out.printf("%s,%s,%s,",
-              RyuDouble.doubleToString(f),
+              Doubleback.doubleToString(f),
               Double.valueOf(d2s_time),
-              Double.valueOf(RyuDouble.doubleToString(f).length()));
+              Double.valueOf(Doubleback.doubleToString(f).length()));
 
           System.out.printf("%s,%s,%s,",
-              RyuDouble.doubleToString(f),
+              Doubleback.doubleToString(f),
               Double.valueOf(dfmt_time),
-              Double.valueOf(RyuDouble.doubleToString(f).length()));
+              Double.valueOf(Doubleback.dfmt(f).length()));
 
           System.out.printf("\n");
         }

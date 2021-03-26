@@ -22,7 +22,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
   EuclidMinMaxTest.class,
 
-  RyuFloatTest.class,
   RyuDoubleTest.class,
 
   SlowFloatTest.class,
