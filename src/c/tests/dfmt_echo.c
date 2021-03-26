@@ -47,5 +47,6 @@ int main (int argc, char **argv) {
             puts("ERROR");
         }
     }
+    return 0;
 }
 

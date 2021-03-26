@@ -79,9 +79,9 @@ Doubleback is in development and is NOT READY for use or contributions.
 There are a number of dependencies for building Doubleback. See the [build document](docs/Build.md).
 
 ```
-$ git clone https://github.com/ironmeld/doubleback
-$ cd doubleback
-$ make && make test && make benchmark
+git clone https://github.com/ironmeld/doubleback
+cd doubleback
+make && make test && make benchmark
 ```
 
 # The Problem with Printing Floating-Point Numbers

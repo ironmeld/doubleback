@@ -2,7 +2,7 @@ all:
 	./build.sh
 
 gendoubles: gendoubles.c
-	gcc gendoubles.c -o gendoubles
+	gcc -std=c99 gendoubles.c -o gendoubles
 
 test: gendoubles
 	./test.sh

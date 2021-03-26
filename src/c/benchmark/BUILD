@@ -8,4 +8,5 @@ cc_binary(
     "//doubleback:dparse",
     "//third_party/mersenne",
   ],
+  copts = ["-std=c99"],
 )

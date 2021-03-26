@@ -9,6 +9,7 @@ cc_library(
     "common.h",
   ],
   hdrs = ["dfmt.h"],
+  copts = ["-std=c99"],
 )
 
 cc_library(
@@ -20,6 +21,7 @@ cc_library(
     "common.h",
   ],
   hdrs = ["dparse.h"],
+  copts = ["-std=c99"],
 )
 
 cc_library(
