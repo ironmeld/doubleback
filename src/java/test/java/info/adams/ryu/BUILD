@@ -6,7 +6,7 @@ java_test(
   srcs = glob(["*.java"]),
   deps = [
     "//main/java/info/adams/ryu",
-    "//main/java/info/adams/ryu/analysis",
+    "//test/java/info/adams/ryu/analysis",
     "//third_party/jaffer",
     "//third_party/junit",
   ],

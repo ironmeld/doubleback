@@ -7,7 +7,7 @@
   outs = [lang + "-double-shortest-64bit-data.csv"],
   cmd = "$(location " + dep + ") -data -csv -samples=50 > $@",
 ) for (lang,dep) in [
-    ("java", "//main/java/info/adams/ryu/benchmark"),
+    ("java", "//test/java/info/adams/ryu/benchmark"),
   ]
 ]
 
@@ -43,7 +43,7 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   outs = [lang + "-double-shortest-bydigits-summary.csv"],
   cmd = "$(location " + dep + ") -csv -samples=50 > $@",
 ) for (lang,dep) in [
-    ("java", "//main/java/info/adams/ryu/benchmark"),
+    ("java", "//test/java/info/adams/ryu/benchmark"),
   ]
 ]
 
