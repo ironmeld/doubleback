@@ -15,8 +15,6 @@
 // is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.
 
-#include "ryu/ryu_parse.h"
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -28,13 +26,14 @@
 #include <stdio.h>
 #endif
 
-#include "ryu/common.h"
-
+#include "doubleback/common.h"
+// Include either the small or the full lookup tables depending on the mode.
 #if defined(RYU_OPTIMIZE_SIZE)
-#include "ryu/d2s_small_table.h"
+#include "doubleback/ryu_small_table.h"
 #else
-#include "ryu/d2s_full_table.h"
+#include "doubleback/ryu_full_table.h"
 #endif
+#include "doubleback/dparse.h"
 
 #define DOUBLE_MANTISSA_BITS 52
 #define DOUBLE_EXPONENT_BITS 11

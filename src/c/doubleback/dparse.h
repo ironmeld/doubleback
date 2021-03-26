@@ -1,4 +1,4 @@
-// Copyright 2018 Ulf Adams
+// Copyright 2019 Ulf Adams
 //
 // The contents of this file may be used under the terms of the Apache License,
 // Version 2.0.
@@ -14,20 +14,32 @@
 // Unless required by applicable law or agreed to in writing, this software
 // is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.
-#ifndef RYU_H
-#define RYU_H
+#ifndef DOUBLEBACK_DPARSE_H
+#define DOUBLEBACK_DPARSE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <inttypes.h>
+// This is an experimental implementation of parsing strings to 64-bit floats
+// using a Ryu-like algorithm. At this time, it only support up to 17 non-zero
+// digits in the input, and also does not support all formats. Use at your own
+// risk.
+//
+// This implementation does not currently support -DRYU_OPTIMIZE_SIZE and always
+// compiles against the large lookup tables.
 
-int dfmt_buffered_n(const double input_value, char* output_buffer);
-char *dfmt(const double input_value, char* output_buffer);
+enum Status {
+  SUCCESS,
+  INPUT_TOO_SHORT,
+  INPUT_TOO_LONG,
+  MALFORMED_INPUT
+};
+
+enum Status dparse(const char * buffer, double * result);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // RYU_H
+#endif // DOUBLEBACK_DPARSE_H

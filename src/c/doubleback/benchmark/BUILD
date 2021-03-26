@@ -4,8 +4,8 @@ cc_binary(
   name = "ryu_benchmark_shortest",
   srcs = ["benchmark_shortest.c"],
   deps = [
-    "//ryu",
-    "//ryu:ryu_parse",
+    "//doubleback:dfmt",
+    "//doubleback:dparse",
     "//third_party/mersenne",
   ],
 )

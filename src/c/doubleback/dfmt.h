@@ -14,38 +14,20 @@
 // Unless required by applicable law or agreed to in writing, this software
 // is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.
+#ifndef DOUBLEBACK_DFMT_H
+#define DOUBLEBACK_DFMT_H
 
-#if defined(__linux__)
-#define _GNU_SOURCE
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#include <stdbool.h>
 #include <inttypes.h>
-#include <time.h>
-#include <string.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 
-#if defined(__linux__)
-#include <sys/types.h>
-#include <unistd.h>
+int dfmt_buffered_n(const double input_value, char* output_buffer);
+char *dfmt(const double input_value, char* output_buffer);
+
+#ifdef __cplusplus
+}
 #endif
 
-#include "ryu/ryu.h"
-#include "ryu/ryu_parse.h"
-
-int main (int argc, char **argv) {
-    char buffer[1024];
-    double d;
-    while (fgets(buffer, 1024, stdin) != NULL) {
-        buffer[strcspn(buffer,"\n")] = 0;
-        if (dparse(buffer, &d) == SUCCESS) {
-            dfmt(d, buffer);
-            puts(buffer);
-        } else {
-            puts("ERROR");
-        }
-    }
-}
-
+#endif // DOUBLEBACK_DFMT_H
