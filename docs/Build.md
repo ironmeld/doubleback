@@ -61,3 +61,13 @@ curl -O https://copr.fedorainfracloud.org/coprs/vbatts/bazel/repo/epel-8/vbatts-
 sudo mv vbatts-bazel-epel-8.repo /etc/yum.repos.d/
 sudo dnf install bazel  # this installs java 11
 ```
+
+# Fedora 33
+
+```
+sudo dnf update
+sudo dnf install git make gcc gcc-c++ cmake gnuplot
+sudo dnf install dnf-plugins-core
+sudo dnf copr enable vbatts/bazel
+sudo dnf install bazel
+```
