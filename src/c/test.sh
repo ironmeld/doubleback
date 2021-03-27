@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -e
-
+printf "%s\n" "Running c tests"
 DFMT_TEST_INPUT="${DFMT_TEST_INPUT:-../test-input.csv}"
 DFMT_TEST_EXPECTED="${DFMT_TEST_EXPECTED:-../test-expected.csv}"
 
