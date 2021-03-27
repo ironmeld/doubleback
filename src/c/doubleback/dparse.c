@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #ifdef RYU_DEBUG
 #include <inttypes.h>
@@ -258,16 +259,160 @@ enum Status s2d_n(const char * buffer, const int len, double * result) {
 
 enum Status dparse(const char * buffer, double * result) {
   int digits = 0;
-  for (int i=0; i < strlen(buffer); i++) {
+  int leading_zeros = 0;
+  bool seen_nonzero = false;
+  bool seen_negative = false;
+  bool seen_plus = false;
+  bool seen_e = false;
+  bool seen_point = false;
+
+  int len = strlen(buffer);
+  for (int i=0; i < len; i++) {
+      if (buffer[i] == '-') {
+          if (seen_negative || seen_plus || leading_zeros > 0 || digits > 0) {
+              return MALFORMED_INPUT;
+          }
+          seen_negative = true;
+          continue;
+      }
+
+      if (buffer[i] == '+') {
+          if (seen_negative || seen_plus || leading_zeros > 0 || digits > 0) {
+              return MALFORMED_INPUT;
+          }
+          seen_plus = true;
+          continue;
+      }
+
+      if (buffer[i] == 'i' || buffer[i] == 'I') {
+          if (seen_plus || seen_negative) {
+              if (i != 1 || len < 4) {
+                  return MALFORMED_INPUT;
+              }
+          } else {
+              if (i != 0 || len < 3) {
+                  return MALFORMED_INPUT;
+              }
+          }
+          if (buffer[i+1] != 'n' && buffer[i+1] != 'N') {
+              return MALFORMED_INPUT;
+          }
+          if (buffer[i+2] != 'f' && buffer[i+2] != 'F') {
+              return MALFORMED_INPUT;
+          }
+          if (seen_negative) {
+              *result = -INFINITY;
+          } else {
+              *result = INFINITY;
+          }
+          return SUCCESS;
+      }
+
+      if (buffer[i] == 'n' || buffer[i] == 'N') {
+          if (seen_plus || seen_negative) {
+              if (i != 1 || len < 4) {
+                  return MALFORMED_INPUT;
+              }
+          } else {
+              if (i != 0 || len < 3) {
+                  return MALFORMED_INPUT;
+              }
+          }
+          if (buffer[i+1] != 'a' && buffer[i+1] != 'A') {
+              return MALFORMED_INPUT;
+          }
+          if (buffer[i+2] != 'n' && buffer[i+2] != 'N') {
+              return MALFORMED_INPUT;
+          }
+          *result = NAN;
+          return SUCCESS;
+      }
+
+      if (buffer[i] == '0') {
+          // only one leading zero for exponents
+          if (seen_e && leading_zeros > 0) {
+              return MALFORMED_INPUT;
+          }
+          if (!seen_point) {
+              // left side, allow one leading zero
+              if (!seen_nonzero) {
+                  leading_zeros++;
+                  if (leading_zeros > 1) {
+                      return MALFORMED_INPUT;
+                  }
+              } else {
+                  digits++;
+                  if (digits > 17) {
+                      return MALFORMED_INPUT;
+                  }
+              }
+          } else {
+              // right side
+              if (!seen_nonzero) {
+                  // allow many leading zeros
+                  leading_zeros++;
+                  if (leading_zeros > 16) {
+                      return MALFORMED_INPUT;
+                  }
+              } else {
+                  // we're past leading zeros
+                  digits++;
+                  if (digits > 17 || digits + leading_zeros > 20) {
+                      return MALFORMED_INPUT;
+                  }
+              }
+          }
+          continue;
+      }
+
+      if (buffer[i] >= '1' && buffer[i] <= '9') {
+          digits++;
+          if (!seen_point && leading_zeros > 0) {
+              // left side, no leading zeros before nonzero
+              return MALFORMED_INPUT;
+          }
+
+          if (!seen_e) {
+              if (digits > 17 || digits + leading_zeros > 20) {
+                  return MALFORMED_INPUT;
+              }
+          } else {
+              if (digits > 3) {
+                  return MALFORMED_INPUT;
+              }
+          }
+          seen_nonzero = true;
+          leading_zeros = 0;
+          continue;
+      }
+
+      if (buffer[i] == '.') {
+          if (seen_point || seen_e) {
+              return MALFORMED_INPUT;
+          }
+          seen_point = true;
+          seen_nonzero = false;
+          leading_zeros = 0;
+          continue;
+      }
+
       if (buffer[i] == 'e' || buffer[i] == 'E') {
-          break;
+          if (seen_e) {
+              return MALFORMED_INPUT;
+          }
+          seen_e = true;
+          seen_plus = false;
+          seen_negative = false;
+          digits = 0;
+          leading_zeros = 0;
+          continue;
       }
-      if (buffer[i] >= '0' && buffer[i] <= '9') {
-         digits++;
-         if (digits > 17) {
-            return MALFORMED_INPUT;
-         }
-      }
+
+      return MALFORMED_INPUT;
   }
+  if (seen_point && digits + leading_zeros > 17) {
+      return MALFORMED_INPUT;
+  }
+  
   return s2d_n(buffer, strlen(buffer), result);
 }

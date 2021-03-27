@@ -7,12 +7,13 @@ if [ "$TRAVIS_OS_NAME" = "windows" ]; then
 	exit 0
 fi
 
-printf "%s\n" "Running bazel tests..."
+printf "%s\n" "$(date) JAVA: Running bazel tests..."
 bazel test //src/... //testsrc/...
 
-printf "%s\n" "Running dfmt echo test..."
+printf "%s\n" "$(date) JAVA: Running dfmt echo test..."
 DFMT_TEST_INPUT="${DFMT_TEST_INPUT:-../test-input.csv}" 
 DFMT_TEST_EXPECTED="${DFMT_TEST_EXPECTED:-../test-expected.csv}" 
 < "$DFMT_TEST_INPUT" bazel run -c opt //testsrc/com/ironmeld/doubleback:dfmtecho -- > test.out
+echo diff "$DFMT_TEST_EXPECTED" test.out
 diff "$DFMT_TEST_EXPECTED" test.out
 rm -f test.out

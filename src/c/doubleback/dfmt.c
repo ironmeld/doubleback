@@ -589,7 +589,7 @@ int dfmt_n(double d, char* result) {
   int len;
   const uint32_t olength = decimalLength17(v.mantissa);
   int32_t exp = v.exponent + (int32_t) olength - 1;
-  if ( exp <= -5 || exp >= 17) {
+  if ( exp <= -5 || exp >= 16) {
       len = to_chars(v, ieeeSign, result, 'e');
   } else {
       len = to_chars(v, ieeeSign, result, 'e');

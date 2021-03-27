@@ -98,7 +98,7 @@ public final class Doubleback {
   }
 
   public static String dfmt(double value) {
-    return doubleToString(value, RoundingMode.ROUND_EVEN, 'e', -4, 17, false);
+    return doubleToString(value, RoundingMode.ROUND_EVEN, 'e', -4, 16, false);
   }
 
   public static String doubleToString(double value,
@@ -511,26 +511,172 @@ public final class Doubleback {
                          + (bits13 << 10)) >>> actualShift;
   }
 
-  public static boolean isValid(String value) {
-      int numDigits = 0;
-      for (int i = 0; i < value.length(); i++) {
-          char c = value.charAt(i);
-          if (c == 'e' || c == 'E') {
-             break;
-          }
-          if (c >= '0' && c <= '9') {
-             numDigits++;
-             if (numDigits > 17) {
-                 return false;
-             }
-          }
-      }
-      return true;
+  public static boolean isValid(String buffer) {
+    int digits = 0;
+    int leading_zeros = 0;
+    boolean seen_nonzero = false;
+    boolean seen_negative = false;
+    boolean seen_plus = false;
+    boolean seen_e = false;
+    boolean seen_point = false;
+
+    for (int i=0; i < buffer.length(); i++) {
+        if (buffer.charAt(i) == '-') {
+            if (seen_negative || seen_plus || leading_zeros > 0 || digits > 0) {
+                return false;
+            }
+            seen_negative = true;
+            continue;
+        }
+        if (buffer.charAt(i) == '+') {
+            if (seen_negative || seen_plus || leading_zeros > 0 || digits > 0) {
+                return false;
+            }
+            seen_plus = true;
+            continue;
+        }
+
+        if (buffer.charAt(i) == 'i' || buffer.charAt(i) == 'I') {
+            if (seen_plus || seen_negative) {
+                if (i != 1 || buffer.length() < 4) {
+                    return false;
+                }
+            } else {
+                if (i != 0 || buffer.length() < 3) {
+                    return false;
+                }
+            }
+            if (buffer.charAt(i+1) != 'n' && buffer.charAt(i+1) != 'N') {
+                return false;
+            }
+            if (buffer.charAt(i+2) != 'f' && buffer.charAt(i+2) != 'F') {
+                return false;
+            }
+            return true;
+        }
+  
+        if (buffer.charAt(i) == 'n' || buffer.charAt(i) == 'N') {
+            if (seen_plus || seen_negative) {
+                if (i != 1 || buffer.length() < 4) {
+                    return false;
+                }
+            } else {
+                if (i != 0 || buffer.length() < 3) {
+                    return false;
+                }
+            }
+            if (buffer.charAt(i+1) != 'a' && buffer.charAt(i+1) != 'A') {
+                return false;
+            }
+            if (buffer.charAt(i+2) != 'n' && buffer.charAt(i+2) != 'N') {
+                return false;
+            }
+            return true;
+        }
+
+  
+        if (buffer.charAt(i) == '0') {
+            // only one leading zero for exponents
+            if (seen_e && leading_zeros > 0) {
+                return false;
+            }
+            if (!seen_point) {
+                // left side, allow one leading zero
+                if (!seen_nonzero) {
+                    leading_zeros++;
+                    if (leading_zeros > 1) {
+                        return false;
+                    }
+                } else {
+                    digits++;
+                    if (digits > 17) {
+                        return false;
+                    }
+                }
+            } else {
+                // right side
+                if (!seen_nonzero) {
+                    // allow many leading zeros
+                    leading_zeros++;
+                    if (leading_zeros > 16) {
+                        return false;
+                    }
+                } else {
+                    // we're past leading zeros
+                    digits++;
+                    if (digits > 17 || digits + leading_zeros > 20) {
+                        return false;
+                    }
+                }
+            }
+            continue;
+        }
+  
+        if (buffer.charAt(i) >= '1' && buffer.charAt(i) <= '9') {
+            digits++;
+            if (!seen_point && leading_zeros > 0) {
+                // left side, no leading zeros before nonzero
+                return false;
+            }
+  
+            if (!seen_e) {
+                if (digits > 17 || digits + leading_zeros > 20) {
+                    return false;
+                }
+            } else {
+                if (digits > 3) {
+                    return false;
+                }
+            }
+            seen_nonzero = true;
+            leading_zeros = 0;
+            continue;
+        }
+  
+        if (buffer.charAt(i) == '.') {
+            if (seen_point || seen_e) {
+                return false;
+            }
+            seen_point = true;
+            seen_nonzero = false;
+            leading_zeros = 0;
+            continue;
+        }
+  
+        if (buffer.charAt(i) == 'e' || buffer.charAt(i) == 'E') {
+            if (seen_e) {
+                return false;
+            }
+            seen_e = true;
+            seen_plus = false;
+            seen_negative = false;
+            digits = 0;
+            leading_zeros = 0;
+            continue;
+        }
+        return false;
+    }
+    if (seen_point && digits + leading_zeros > 17) {
+        return false;
+    }
+    return true;
   }
 
   public static double dparse(String value) {
       if (!isValid(value)) {
           throw new IllegalArgumentException(value);
+      }
+      if (value.toLowerCase().equals("infinity")) {
+          return Double.POSITIVE_INFINITY;
+      }
+      if (value.toLowerCase().equals("-infinity")) {
+          return Double.NEGATIVE_INFINITY;
+      }
+      if (value.toLowerCase().equals("nan")) {
+          return Double.NaN;
+      }
+      if (value.toLowerCase().equals("-nan")) {
+          return Double.NaN;
       }
       return Double.parseDouble(value);
   }

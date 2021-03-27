@@ -58,7 +58,7 @@ TEST(DFmtTest, LotsOfTrailingZeros) {
 }
 
 TEST(DFmtTest, Regression) {
-  ASSERT_DFMT("-21098088986959630.0", -2.109808898695963e16);
+  ASSERT_DFMT("-2.109808898695963e16", -2.109808898695963e16);
   ASSERT_DFMT("4.940656e-318", 4.940656e-318);
   ASSERT_DFMT("1.18575755e-316", 1.18575755e-316);
   ASSERT_DFMT("2.989102097996e-312", 2.989102097996e-312);
@@ -133,12 +133,12 @@ TEST(DFmtTest, MinMaxShift) {
   // 32-bit opt-size=1:  57 <= dist <= 58
   // 64-bit opt-size=0:  58 <= dist <= 58
   // 64-bit opt-size=1:  58 <= dist <= 58
-  ASSERT_DFMT("18014398509481984.0", ieeeParts2Double(false, 1077, 0));
+  ASSERT_DFMT("1.8014398509481984e16", ieeeParts2Double(false, 1077, 0));
   // 32-bit opt-size=0:  57 <= dist <= 57
   // 32-bit opt-size=1:  57 <= dist <= 57
   // 64-bit opt-size=0:  58 <= dist <= 58
   // 64-bit opt-size=1:  58 <= dist <= 58
-  ASSERT_DFMT("36028797018963964.0", ieeeParts2Double(false, 1076, maxMantissa));
+  ASSERT_DFMT("3.6028797018963964e16", ieeeParts2Double(false, 1076, maxMantissa));
   // 32-bit opt-size=0:  51 <= dist <= 52
   // 32-bit opt-size=1:  51 <= dist <= 59
   // 64-bit opt-size=0:  52 <= dist <= 52
