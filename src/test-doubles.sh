@@ -25,20 +25,20 @@ for subdir in ./*; do
 
     if [ ! -f "$EXPECTED_FILE" ]; then
         printf "Generating expected output using %s\n" "$subdir"
-        < "$INPUT_FILE" make -C "$subdir" run-echo | grep -v "directory" > "$EXPECTED_FILE" 2> /dev/null
+        (cd "$subdir";./dfmt-echo.sh) < "$INPUT_FILE" > "$EXPECTED_FILE"
 
         printf "%s\n" "Verify round trip of expected output"
-        < "$EXPECTED_FILE" make -C "$subdir" run-echo | grep -v "directory" > "$OUTPUT_FILE2" 2> /dev/null
+        (cd "$subdir";./dfmt-echo.sh) < "$EXPECTED_FILE" > "$OUTPUT_FILE2"
         echo diff "$EXPECTED_FILE" "$OUTPUT_FILE2"
         diff "$EXPECTED_FILE" "$OUTPUT_FILE2"
     else
         printf "Verifying that %s produces the same output...\n" "$subdir"
-        < "$INPUT_FILE" make -C "$subdir" run-echo | grep -v "directory" > "$OUTPUT_FILE" 2> /dev/null
+        (cd "$subdir";./dfmt-echo.sh) < "$INPUT_FILE" > "$OUTPUT_FILE"
         echo diff "$EXPECTED_FILE" "$OUTPUT_FILE"
         diff "$EXPECTED_FILE" "$OUTPUT_FILE"
         
         printf "%s\n" "Verify round trip of expected output"
-        < "$OUTPUT_FILE" make -C "$subdir" run-echo | grep -v "directory" > "$OUTPUT_FILE2" 2> /dev/null
+        (cd "$subdir";./dfmt-echo.sh) < "$OUTPUT_FILE" > "$OUTPUT_FILE2"
         echo diff "$OUTPUT_FILE" "$OUTPUT_FILE2"
         diff "$OUTPUT_FILE" "$OUTPUT_FILE2"
     fi
