@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export MSYS2_ARG_CONV_EXCL="//"
+
 # shellcheck disable=SC2059
 fmt="\nBENCHMARKING with %s\n"
 

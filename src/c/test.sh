@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export MSYS2_ARG_CONV_EXCL="//"
+
 printf "%s\n" "Running c tests"
 DFMT_TEST_INPUT="${DFMT_TEST_INPUT:-../test-input.csv}"
 DFMT_TEST_EXPECTED="${DFMT_TEST_EXPECTED:-../test-expected.csv}"
