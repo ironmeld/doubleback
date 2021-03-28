@@ -88,7 +88,7 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   tools = ["shortest-parse.template"],
   outs = [lang + "-double-shortest-bydigits-parse.pdf"],
   cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-parse", lang, s1, s2),
-) for (lang,s1,s2) in [("c","snprintf %.17g","Doubleback dfmt")]
+) for (lang,s1,s2) in [("c","strtod","Doubleback dparse")]
 ]
 
 [genrule(
@@ -97,5 +97,5 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   tools = ["shortest-parse-png.template"],
   outs = [lang + "-double-shortest-bydigits-parse.png"],
   cmd = CONVERSION_CMD_RYU_SHORTEST % ("shortest-parse-png", lang, s1, s2),
-) for (lang,s1,s2) in [("c","snprintf %.17g","Doubleback dfmt")]
+) for (lang,s1,s2) in [("c","strtod","Doubleback dparse")]
 ]
