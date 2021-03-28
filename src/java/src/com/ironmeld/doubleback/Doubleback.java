@@ -528,6 +528,7 @@ public final class Doubleback {
             seen_negative = true;
             continue;
         }
+
         if (buffer.charAt(i) == '+') {
             if (seen_negative || seen_plus || leading_zeros > 0 || digits > 0) {
                 return false;
@@ -537,41 +538,17 @@ public final class Doubleback {
         }
 
         if (buffer.charAt(i) == 'i' || buffer.charAt(i) == 'I') {
-            if (seen_plus || seen_negative) {
-                if (i != 1 || buffer.length() < 4) {
-                    return false;
-                }
-            } else {
-                if (i != 0 || buffer.length() < 3) {
-                    return false;
-                }
-            }
-            if (buffer.charAt(i+1) != 'n' && buffer.charAt(i+1) != 'N') {
+            if (i != ((seen_plus || seen_negative) ? 1 : 0)) {
                 return false;
             }
-            if (buffer.charAt(i+2) != 'f' && buffer.charAt(i+2) != 'F') {
-                return false;
-            }
-            return true;
+            return buffer.substring(i, i+8).toLowerCase().equals("infinity");
         }
   
         if (buffer.charAt(i) == 'n' || buffer.charAt(i) == 'N') {
-            if (seen_plus || seen_negative) {
-                if (i != 1 || buffer.length() < 4) {
-                    return false;
-                }
-            } else {
-                if (i != 0 || buffer.length() < 3) {
-                    return false;
-                }
-            }
-            if (buffer.charAt(i+1) != 'a' && buffer.charAt(i+1) != 'A') {
+            if (i != ((seen_plus || seen_negative) ? 1 : 0)) {
                 return false;
             }
-            if (buffer.charAt(i+2) != 'n' && buffer.charAt(i+2) != 'N') {
-                return false;
-            }
-            return true;
+            return buffer.substring(i, i+3).toLowerCase().equals("nan");
         }
 
   

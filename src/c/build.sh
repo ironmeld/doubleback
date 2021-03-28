@@ -1,14 +1,13 @@
 #!/bin/bash
+# shellcheck disable=SC2059
 
+# makes windows work with bazel's prefix for targets
 export MSYS2_ARG_CONV_EXCL="//"
 
-# shellcheck disable=SC2059
-fmt="Building with %s\n"
+fmt="\nBuilding with %s\n"
 
 printf "$fmt" "Uncompressed tables and 128-bit types allowed"
 bazel build //doubleback/...
-bazel build //tests/...
-bazel build //benchmark/...
 
 printf "$fmt" "64-bit only, 128-bit types not allowed"
 bazel build --copt=-DRYU_ONLY_64_BIT_OPS //doubleback/...

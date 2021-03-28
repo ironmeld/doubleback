@@ -4,10 +4,6 @@ all:
 test:
 	./test.sh
 
-# This parses doubles, one per line, and prints them using dfmt.
-run-echo:
-	@bazel run -c opt //testsrc/com/ironmeld/doubleback:dfmtecho -- 2> /dev/null
-
 benchmark:
 	./benchmark.sh
 
@@ -16,4 +12,4 @@ clean:
 	rm -rf bazel-*
 	rm -rf ~/.cache/bazel
 
-.PHONY: all test run-echo benchmark clean
+.PHONY: all test benchmark clean

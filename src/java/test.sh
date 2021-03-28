@@ -2,6 +2,9 @@
 set -eo pipefail
 IFS=$'\n\t'
 
+# makes windows work with bazel's prefix for targets
+export MSYS2_ARG_CONV_EXCL="//"
+
 if [ "$TRAVIS_OS_NAME" = "windows" ]; then
     printf "%s\n" "Skipping java on windows!"
 	exit 0
