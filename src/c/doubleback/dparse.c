@@ -257,18 +257,6 @@ enum Status s2d_n(const char * buffer, const int len, double * result) {
   return SUCCESS;
 }
 
-// This only compares for the length of the reference string.
-// The reference string must be lowercase.
-int lower_compare(char const *string_to_check, char const *lowercase_reference) {
-    for (;*lowercase_reference; string_to_check++, lowercase_reference++) {
-        int d = (*string_to_check | 32) - *lowercase_reference;
-        if (d != 0 || !*string_to_check) {
-            return d;
-        }
-    }
-    return 0;
-}
-
 enum Status dparse(const char * buffer, double * result) {
   int digits = 0;
   int leading_zeros = 0;
@@ -297,10 +285,19 @@ enum Status dparse(const char * buffer, double * result) {
       }
 
       if (buffer[i] == 'i' || buffer[i] == 'I') {
-          if (i != (seen_plus || seen_negative) ? 1 : 0) {
+          if (seen_plus || seen_negative) {
+              if (i != 1 || len < 4) {
+                  return MALFORMED_INPUT;
+              }
+          } else {
+              if (i != 0 || len < 3) {
+                  return MALFORMED_INPUT;
+              }
+          }
+          if (buffer[i+1] != 'n' && buffer[i+1] != 'N') {
               return MALFORMED_INPUT;
           }
-          if (lower_compare(&buffer[i], "infinity")) {
+          if (buffer[i+2] != 'f' && buffer[i+2] != 'F') {
               return MALFORMED_INPUT;
           }
           if (seen_negative) {
@@ -312,10 +309,19 @@ enum Status dparse(const char * buffer, double * result) {
       }
 
       if (buffer[i] == 'n' || buffer[i] == 'N') {
-          if (i != (seen_plus || seen_negative) ? 1 : 0) {
+          if (seen_plus || seen_negative) {
+              if (i != 1 || len < 4) {
+                  return MALFORMED_INPUT;
+              }
+          } else {
+              if (i != 0 || len < 3) {
+                  return MALFORMED_INPUT;
+              }
+          }
+          if (buffer[i+1] != 'a' && buffer[i+1] != 'A') {
               return MALFORMED_INPUT;
           }
-          if (lower_compare(&buffer[i], "nan")) {
+          if (buffer[i+2] != 'n' && buffer[i+2] != 'N') {
               return MALFORMED_INPUT;
           }
           *result = NAN;
