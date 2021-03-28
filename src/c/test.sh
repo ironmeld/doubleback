@@ -5,7 +5,6 @@ DFMT_TEST_INPUT="${DFMT_TEST_INPUT:-../test-input.csv}"
 DFMT_TEST_EXPECTED="${DFMT_TEST_EXPECTED:-../test-expected.csv}"
 
 < "$DFMT_TEST_INPUT" bazel run -c opt //tests:dfmt_echo -- > test.out
-echo $?
 pwd
 echo diff "$DFMT_TEST_EXPECTED" test.out
 diff "$DFMT_TEST_EXPECTED" test.out

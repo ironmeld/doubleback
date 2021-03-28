@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # shellcheck disable=SC2059
-fmt="\nBENCHMARKING c with %s\n"
+fmt="\nBENCHMARKING with %s\n"
 
 printf "$fmt" "Uncompressed tables and 128-bit types allowed"
 bazel run -c opt //benchmark:ryu_benchmark_shortest -- -samples=250
