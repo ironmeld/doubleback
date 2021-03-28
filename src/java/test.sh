@@ -7,6 +7,8 @@ if [ "$TRAVIS_OS_NAME" = "windows" ]; then
 	exit 0
 fi
 
+set -e
+
 printf "%s\n" "$(date) JAVA: Running bazel tests..."
 bazel test //src/... //testsrc/...
 
