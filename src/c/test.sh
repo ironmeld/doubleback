@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# exit on error
+set -e
+
 # makes windows work with bazel's prefix for targets
 export MSYS2_ARG_CONV_EXCL="//"
 
