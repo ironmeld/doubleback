@@ -1,8 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 /* Generate 1 million random doubles in various formats */
 int main(int argc, char **argv) {
+    int seed = time(NULL);
+    fprintf(stderr, "rand seed is %d\n", seed);
+    srand(seed);
 
     for (int i=1; i <= 1000000; i++) {
         int type = rand() % 9;
