@@ -2,3 +2,4 @@ bazel-*
 /.eclipse-bin/
 /.project
 .vscode/
+fuzz/
