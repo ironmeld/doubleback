@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# makes windows work with bazel's prefix for targets
-export MSYS2_ARG_CONV_EXCL="//"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd "$SCRIPT_DIR" || exit 1
 
-bazel run -c opt //testsrc/com/ironmeld/doubleback:dfmtecho -- 2> /dev/null
+./bazel-bin/testsrc/com/ironmeld/doubleback/dfmtecho

@@ -17,4 +17,3 @@ done
 
 # test output of each subdir against each other
 ./test-doubles.sh
-

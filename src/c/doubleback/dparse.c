@@ -83,6 +83,8 @@ enum Status s2d_n(const char * buffer, const int len, double * result) {
   if (buffer[i] == '-') {
     signedM = true;
     i++;
+  } else if (buffer[i] == '+') {
+    i++;
   }
   for (; i < len; i++) {
     char c = buffer[i];
@@ -257,12 +259,14 @@ enum Status s2d_n(const char * buffer, const int len, double * result) {
   return SUCCESS;
 }
 
-// This only compares for the length of the reference string.
 // The reference string must be lowercase.
-int lower_compare(char const *string_to_check, char const *lowercase_reference) {
-    for (;*lowercase_reference; string_to_check++, lowercase_reference++) {
+int compare_lower(char const *string_to_check, char const *lowercase_reference) {
+    for (;; string_to_check++, lowercase_reference++) {
+        if (!*string_to_check || !*lowercase_reference) {
+            return *string_to_check || *lowercase_reference;
+        }
         int d = (*string_to_check | 32) - *lowercase_reference;
-        if (d != 0 || !*string_to_check) {
+        if (d != 0) {
             return d;
         }
     }
@@ -297,10 +301,10 @@ enum Status dparse(const char * buffer, double * result) {
       }
 
       if (buffer[i] == 'i' || buffer[i] == 'I') {
-          if (i != (seen_plus || seen_negative) ? 1 : 0) {
+          if (i != ((seen_plus || seen_negative) ? 1 : 0)) {
               return MALFORMED_INPUT;
           }
-          if (lower_compare(&buffer[i], "infinity")) {
+          if (compare_lower(&buffer[i], "infinity")) {
               return MALFORMED_INPUT;
           }
           if (seen_negative) {
@@ -315,7 +319,7 @@ enum Status dparse(const char * buffer, double * result) {
           if (i != (seen_plus || seen_negative) ? 1 : 0) {
               return MALFORMED_INPUT;
           }
-          if (lower_compare(&buffer[i], "nan")) {
+          if (compare_lower(&buffer[i], "nan")) {
               return MALFORMED_INPUT;
           }
           *result = NAN;
@@ -324,7 +328,7 @@ enum Status dparse(const char * buffer, double * result) {
 
       if (buffer[i] == '0') {
           // only one leading zero for exponents
-          if (seen_e && leading_zeros > 0) {
+          if (seen_e && (leading_zeros > 0 || digits >= 3)) {
               return MALFORMED_INPUT;
           }
           if (!seen_point) {
@@ -385,13 +389,16 @@ enum Status dparse(const char * buffer, double * result) {
               return MALFORMED_INPUT;
           }
           seen_point = true;
-          seen_nonzero = false;
           leading_zeros = 0;
           continue;
       }
 
       if (buffer[i] == 'e' || buffer[i] == 'E') {
           if (seen_e) {
+              return MALFORMED_INPUT;
+          }
+          // cannot start with e
+          if (digits == 0 && leading_zeros == 0) {
               return MALFORMED_INPUT;
           }
           seen_e = true;
@@ -404,7 +411,12 @@ enum Status dparse(const char * buffer, double * result) {
 
       return MALFORMED_INPUT;
   }
+  // too many digits
   if (seen_point && digits + leading_zeros > 17) {
+      return MALFORMED_INPUT;
+  }
+  // not enough digits
+  if (digits == 0 && leading_zeros == 0) {
       return MALFORMED_INPUT;
   }
   

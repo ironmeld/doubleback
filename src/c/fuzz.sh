@@ -1,21 +1,48 @@
 #!/bin/bash
 # shellcheck disable=SC2129
+set -e
 
 export CC=afl-clang-fast
-WORKERS=40
+FUZZPROG=dfmt_fuzz
+WORKERS=48
+FUZZ_TIME=60
+FUZZ_MEM_MB=50
 
+# end of config
+
+ALT_LANG="$1"
+FUZZARGS=()
+if [ -n "$ALT_LANG" ]; then
+    FUZZARGS=("SPACE" "$ALT_LANG")
+    if [ ! -d "../$ALT_LANG" ]; then
+        printf "Directory %s does not exist!\n" "../$ALT_LANG"
+        exit 1
+    fi
+else
+    FUZZARGS=()
+fi
+
+if [ "$ALT_LANG" = "java" ]; then
+    FUZZ_MEM_MB=48000 # needed due to jvm allocation bug
+fi
+
+# create a workspace directory
 rm -rf fuzz
 mkdir fuzz && cd fuzz || exit 1
-"$CC" -I .. -c ../doubleback/dfmt.c -o dfmt.o
-"$CC" -I .. -c ../doubleback/dparse.c -o dparse.o
-"$CC" -I .. dfmt.o dparse.o ../tests/dfmt_echo.c -o dfmt_echo
 
+# Compile the fuzzer test proghram with afl
+"$CC" -Wall -I .. -c ../doubleback/dfmt.c -o dfmt.o
+"$CC" -Wall -I .. -c ../doubleback/dparse.c -o dparse.o
+"$CC" -Wall -I .. dfmt.o dparse.o "../tests/${FUZZPROG}.c" -o "${FUZZPROG}"
+
+# Create fuzzer seed inputs
 mkdir fuzz_in
 for i in $(seq "$(wc -l ../../test-input.csv | cut -f1 -d' ')"); do
    # take line # i from the input file and create a separate input file
    sed "${i}q;d"  < ../../test-input.csv > fuzz_in/"$i"
 done
 
+# Create fuzzer vocabulary
 rm -f vocab
 for i in $(seq 0 9); do
     printf "\"%s\"\n" "$i" >> vocab
@@ -25,31 +52,63 @@ printf "\"%s\"\n" "-" >> vocab
 printf "\"%s\"\n" "324" >> vocab
 printf "\"%s\"\n" "325" >> vocab
 printf "\"%s\"\n" "." >> vocab
+printf "\"%s\"\n" "Infinity" >> vocab
+printf "\"%s\"\n" "NaN" >> vocab
 printf "\"%s\"\n" "e" >> vocab
 printf "\"%s\"\n" "E" >> vocab
+printf "\"%s\"\n" "0.0" >> vocab
 printf "\"%s\"\n" "000" >> vocab
 printf "\"%s\"\n" "000000" >> vocab
 printf "\"%s\"\n" "99999999999999999" >> vocab
+printf "\"%s\"\n" "x" >> vocab # invalid char
 
+
+printf "\n%s Starting fuzzer(s)...\n" "$(date)"
 mkdir fuzz_out
-
 tmux new -d -s fuzz-master
-tmux send-keys -t fuzz-master.0 afl-fuzz SPACE -i SPACE fuzz_in SPACE -x SPACE vocab SPACE -o SPACE fuzz_out SPACE -M SPACE master SPACE -- SPACE ./dfmt_echo ENTER
+tmux send-keys -t fuzz-master.0 afl-fuzz SPACE -i SPACE fuzz_in SPACE -x SPACE vocab SPACE -o SPACE fuzz_out SPACE -M SPACE master SPACE -m SPACE "$FUZZ_MEM_MB" SPACE -t SPACE 8000 SPACE -- SPACE ./${FUZZPROG} "${FUZZARGS[@]}" ENTER
 
-printf "%s\n" "Fuzzing is being started. Please wait for a few seconds..."
 for worker in $(seq "$WORKERS"); do
     tmux new -d -s fuzz-worker-"$worker"
-    tmux send-keys -t fuzz-worker-"$worker".0 afl-fuzz SPACE -i SPACE fuzz_in SPACE -x SPACE vocab SPACE -o SPACE fuzz_out SPACE -M SPACE worker"$worker" SPACE -- SPACE ./dfmt_echo ENTER
+    tmux send-keys -t fuzz-worker-"$worker".0 afl-fuzz SPACE -i SPACE fuzz_in SPACE -x SPACE vocab SPACE -o SPACE fuzz_out SPACE -M SPACE worker"$worker" SPACE -m SPACE "$FUZZ_MEM_MB" SPACE -t SPACE 8000 -- SPACE ./${FUZZPROG} "${FUZZARGS[@]}" ENTER
 done
 
-date
-printf "%s\n" "To see progress, attached to tmux window \"fuzz-master\"."
-printf "%s" "Press return to end fuzzing: "
-read -r _
+printf "%s Fuzzers Started. To see progress, attached to tmux window \"fuzz-master\".\n" "$(date)"
+printf "Waiting %d seconds ...\n" "$FUZZ_TIME"
+sleep "$FUZZ_TIME"
 
-printf "%s\n" "Fuzzing is being terminated. Please wait for a few seconds..."
+printf "Fuzzing is being terminated. Please wait ...\n"
+tmux kill-window -t fuzz-master
 for worker in $(seq "$WORKERS"); do
     tmux kill-window -t fuzz-worker-"$worker"
 done
-tmux kill-window -t fuzz-master
 cd ..
+
+crashcount="$(find fuzz/fuzz_out/master/crashes -name "id*" 2> /dev/null | wc -l)"
+
+if [ "$crashcount" = "0" ]; then
+    printf "There are no crashes!\n"
+    exit 0
+fi
+
+printf "There are %d crashes\n" "$crashcount"
+
+# The fuzzer test program produces a crash when a difference
+# is detected between implementations.
+# This loop goes through each crash a displays the difference in behavior.
+for crash_file in ./fuzz/fuzz_out/master/crashes/id*
+do
+    printf "\nCrash File: %s\n" "$crash_file"
+    printf "Input:\n"
+    cat "$crash_file"
+
+    # What did c do?
+    printf "\nThis is the output from %s:\n" "c"
+    ./dfmt-echo.sh < "$crash_file"
+
+    # What did $ALT_LANG do?
+    printf "\nThis is the output from %s:\n" "$ALT_LANG"
+    (cd "../$ALT_LANG";./dfmt-echo.sh ) < "$crash_file"
+done
+
+exit 1

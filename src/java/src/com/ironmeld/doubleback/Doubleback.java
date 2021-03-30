@@ -541,21 +541,21 @@ public final class Doubleback {
             if (i != ((seen_plus || seen_negative) ? 1 : 0)) {
                 return false;
             }
-            return buffer.substring(i, i+8).toLowerCase().equals("infinity");
+            return buffer.substring(i).toLowerCase().equals("infinity");
         }
   
         if (buffer.charAt(i) == 'n' || buffer.charAt(i) == 'N') {
             if (i != ((seen_plus || seen_negative) ? 1 : 0)) {
                 return false;
             }
-            return buffer.substring(i, i+3).toLowerCase().equals("nan");
+            return buffer.substring(i).toLowerCase().equals("nan");
         }
 
   
         if (buffer.charAt(i) == '0') {
             // only one leading zero for exponents
-            if (seen_e && leading_zeros > 0) {
-                return false;
+            if (seen_e && (leading_zeros > 0 || digits >= 3)) {
+                 return false;
             }
             if (!seen_point) {
                 // left side, allow one leading zero
@@ -615,7 +615,6 @@ public final class Doubleback {
                 return false;
             }
             seen_point = true;
-            seen_nonzero = false;
             leading_zeros = 0;
             continue;
         }
@@ -624,6 +623,11 @@ public final class Doubleback {
             if (seen_e) {
                 return false;
             }
+            // cannot start with e
+            if (digits == 0 && leading_zeros == 0) {
+                return false;
+            }
+
             seen_e = true;
             seen_plus = false;
             seen_negative = false;
@@ -633,7 +637,12 @@ public final class Doubleback {
         }
         return false;
     }
+    // too many digits
     if (seen_point && digits + leading_zeros > 17) {
+        return false;
+    }
+    // not enough digits
+    if (digits == 0 && leading_zeros == 0) {
         return false;
     }
     return true;

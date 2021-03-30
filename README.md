@@ -70,7 +70,7 @@ Doubleback is in development and is NOT READY for use or contributions.
 
 # Roadmap for first release
 
-* c rountrip tests
+* Specify valid syntax and error behavior precisely
 * Remove extraneous code
 * Dev Documentation
 
