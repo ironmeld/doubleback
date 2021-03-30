@@ -13,8 +13,7 @@ for subdir in ./*; do
           (cd "$subdir";./fuzz.sh)
       fi
 
-      # if the c implementation is present, fuzz this
-      # implementation against it
+      # if the c implementation is present, fuzz this implementation against it
       if [ "$subdir" != "c" ] && [ -d "c" ]; then
           (cd c; ./fuzz.sh "$subdir")
       fi

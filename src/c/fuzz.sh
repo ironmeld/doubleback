@@ -73,9 +73,10 @@ for worker in $(seq "$WORKERS"); do
     tmux send-keys -t fuzz-worker-"$worker".0 afl-fuzz SPACE -i SPACE fuzz_in SPACE -x SPACE vocab SPACE -o SPACE fuzz_out SPACE -M SPACE worker"$worker" SPACE -m SPACE "$FUZZ_MEM_MB" SPACE -t SPACE 8000 -- SPACE ./${FUZZPROG} "${FUZZARGS[@]}" ENTER
 done
 
-printf "%s Fuzzers Started. To see progress, attached to tmux window \"fuzz-master\".\n" "$(date)"
-printf "Waiting %d seconds ...\n" "$FUZZ_TIME"
-sleep "$FUZZ_TIME"
+printf "%s Fuzzers started.\n" "$(date)"
+printf "To see progress, attached to tmux window \"fuzz-master\" or use afl-whatsup.\n"
+printf "Fuzzing for %d seconds. Press return to end early: " "$FUZZ_TIME"
+read -t "$FUZZ_TIME" -r _
 
 printf "Fuzzing is being terminated. Please wait ...\n"
 tmux kill-window -t fuzz-master
