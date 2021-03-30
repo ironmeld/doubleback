@@ -19,6 +19,8 @@ addons:
     packages:
       - bazel
       - gnuplot
+      - afl++-clang
+      - tmux
   homebrew:
     packages:
       - bazel

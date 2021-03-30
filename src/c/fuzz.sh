@@ -5,8 +5,12 @@ set -e
 export CC=afl-clang-fast
 FUZZPROG=dfmt_fuzz
 WORKERS=48
-FUZZ_TIME=60
+FUZZ_TIME=10
 FUZZ_MEM_MB=50
+
+if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    WORKERS=0
+fi
 
 # end of config
 
@@ -80,7 +84,8 @@ set +e
 read -t "$FUZZ_TIME" -r _
 set -e
 
-printf "Fuzzing is being terminated. Please wait ...\n"
+afl-whatsup -s fuzz_out
+printf "Fuzzers are being terminated. Please wait ...\n"
 tmux kill-window -t fuzz-master
 for worker in $(seq "$WORKERS"); do
     tmux kill-window -t fuzz-worker-"$worker"

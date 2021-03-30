@@ -17,3 +17,7 @@ done
 
 # test output of each subdir against each other
 ./test-doubles.sh
+
+if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    ./fuzz.sh
+fi
