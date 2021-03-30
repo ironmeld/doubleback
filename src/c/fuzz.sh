@@ -76,7 +76,9 @@ done
 printf "%s Fuzzers started.\n" "$(date)"
 printf "To see progress, attached to tmux window \"fuzz-master\" or use afl-whatsup.\n"
 printf "Fuzzing for %d seconds. Press return to end early: " "$FUZZ_TIME"
+set +e
 read -t "$FUZZ_TIME" -r _
+set -e
 
 printf "Fuzzing is being terminated. Please wait ...\n"
 tmux kill-window -t fuzz-master
