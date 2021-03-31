@@ -31,7 +31,7 @@ if [ "$ALT_LANG" = "java" ]; then
 fi
 
 # afl requires this
-if [ ! grep core < /proc/sys/kernel/core_pattern ]; then
+if ! grep core < /proc/sys/kernel/core_pattern; then
     echo core | sudo tee /proc/sys/kernel/core_pattern
 fi
 
