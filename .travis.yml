@@ -21,6 +21,7 @@ addons:
       - gnuplot
       - afl++-clang
       - tmux
+      - sysvbanner
   homebrew:
     packages:
       - bazel

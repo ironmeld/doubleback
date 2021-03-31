@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2230
+
 set -euo pipefail
 IFS=$'\n\t'
 
@@ -11,6 +13,9 @@ export DFMT_TEST_EXPECTED
 for subdir in ./*; do
   # support sparse checkouts by only testing what is present
   if [ -d "$subdir" ]; then
+      if [ -n "$(which banner)" ]; then
+          banner "Testing" "${subdir/\.\//}"
+      fi
       make -C "$subdir" test
   fi
 done
