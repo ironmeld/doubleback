@@ -11,5 +11,6 @@ benchmark:
 clean:
 	rm -rf bazel-*
 	rm -rf ~/.cache/bazel
+	rm -rf fuzz
 
 .PHONY: all test benchmark clean

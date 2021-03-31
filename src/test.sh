@@ -13,13 +13,20 @@ export DFMT_TEST_EXPECTED
 for subdir in ./*; do
   # support sparse checkouts by only testing what is present
   if [ -d "$subdir" ]; then
+      lang="${subdir/\.\//}"
+
+      printf "%s starting test of language %s\n" "$(date)" "$lang"
       if [ -n "$(which banner)" ]; then
-          banner "Testing" "${subdir/\.\//}"
+          banner "Testing" "$lang"
       fi
       make -C "$subdir" test
+      printf "%s finished test of language %s\n" "$(date)" "$lang"
   fi
 done
 
+if [ -n "$(which banner)" ]; then
+    banner "Random" "Doubles" "Test - all" "Languages"
+fi
 # test output of each subdir against each other
 ./test-doubles.sh
 

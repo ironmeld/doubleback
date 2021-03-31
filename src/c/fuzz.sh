@@ -31,7 +31,7 @@ if [ "$ALT_LANG" = "java" ]; then
 fi
 
 # afl requires this
-if ! grep core < /proc/sys/kernel/core_pattern; then
+if ! grep -q core < /proc/sys/kernel/core_pattern; then
     echo core | sudo tee /proc/sys/kernel/core_pattern
 fi
 
@@ -100,11 +100,11 @@ cd ..
 crashcount="$(find fuzz/fuzz_out/master/crashes -name "id*" 2> /dev/null | wc -l)"
 
 if [ "$crashcount" = "0" ]; then
-    printf "There are no crashes!\n"
+    printf "%s There are no crashes!\n" "$(date)"
     exit 0
 fi
 
-printf "There are %d crashes\n" "$crashcount"
+printf "%s There are %d crashes\n" "$(date)" "$crashcount"
 
 # The fuzzer test program produces a crash when a difference
 # is detected between implementations.

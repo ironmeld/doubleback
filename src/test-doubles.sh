@@ -16,28 +16,30 @@ rm -f "$EXPECTED_FILE"
 for subdir in ./*; do
   # support sparse checkouts by only testing what is present
   if [ -d "$subdir" ]; then
+    lang="${subdir/\.\//}"
+
     set +u   # allow undefined travis var
-    if [ "$TRAVIS_OS_NAME" = "windows" ] && [ "$subdir" = "./java" ]; then
-      printf "%s\n" "INFO: Skipping java on windows"
+    if [ "$TRAVIS_OS_NAME" = "windows" ] && [ "$lang" = "java" ]; then
+      printf "%s INFO: Skipping %s on windows\n" "$(date)" "$lang"
       continue
     fi
     set -u
 
     if [ ! -f "$EXPECTED_FILE" ]; then
-        printf "Generating expected output using %s\n" "$subdir"
+        printf "%s Generating expected output using %s\n" "$(date)" "$lang"
         (cd "$subdir";./dfmt-echo.sh) < "$INPUT_FILE" > "$EXPECTED_FILE"
 
-        printf "%s\n" "Verify round trip of expected output"
+        printf "%s Verify round trip of expected output\n" "$(date)"
         (cd "$subdir";./dfmt-echo.sh) < "$EXPECTED_FILE" > "$OUTPUT_FILE2"
         echo diff "$EXPECTED_FILE" "$OUTPUT_FILE2"
         diff "$EXPECTED_FILE" "$OUTPUT_FILE2"
     else
-        printf "Verifying that %s produces the same output...\n" "$subdir"
+        printf "%s Verifying that %s produces the same output...\n" "$(date)" "$lang"
         (cd "$subdir";./dfmt-echo.sh) < "$INPUT_FILE" > "$OUTPUT_FILE"
         echo diff "$EXPECTED_FILE" "$OUTPUT_FILE"
         diff "$EXPECTED_FILE" "$OUTPUT_FILE"
         
-        printf "%s\n" "Verify round trip of expected output"
+        printf "%s Verify round trip of expected output\n" "$(date)"
         (cd "$subdir";./dfmt-echo.sh) < "$OUTPUT_FILE" > "$OUTPUT_FILE2"
         echo diff "$OUTPUT_FILE" "$OUTPUT_FILE2"
         diff "$OUTPUT_FILE" "$OUTPUT_FILE2"
