@@ -5,11 +5,11 @@ set -e
 export CC=afl-clang-fast
 FUZZPROG=dfmt_fuzz
 WORKERS=48
-FUZZ_TIME=10
+FUZZ_TIME=60
 FUZZ_MEM_MB=50
 
 if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-    WORKERS=0
+    WORKERS=16
 fi
 
 # end of config
