@@ -15,6 +15,7 @@ These instructions apply to Ubuntu from version 16.04 to the most recent version
 ```
 sudo apt-get update
 sudo apt-get install make gcc openjdk-8-jdk-headless cmake gnuplot
+sudo apt-get install tmux afl++-clang # for fuzz testing
 ```
 
 ## bazel

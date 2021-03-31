@@ -30,6 +30,11 @@ if [ "$ALT_LANG" = "java" ]; then
     FUZZ_MEM_MB=48000 # needed due to jvm allocation bug
 fi
 
+# afl requires this
+if [ ! grep core < /proc/sys/kernel/core_pattern ]; then
+    echo core | sudo tee /proc/sys/kernel/core_pattern
+fi
+
 # create a workspace directory
 rm -rf fuzz
 mkdir fuzz && cd fuzz || exit 1
