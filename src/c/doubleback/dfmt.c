@@ -479,7 +479,7 @@ static inline int copy_special_str_dfmt(char * const result, const bool sign, co
 }
 
 int dreformat(char* result, int len, uint64_t mantissa, int32_t exponent) {
-    assert(exponent >= -4 && exponent <= 16);
+    assert(exponent >= -4 && exponent <= 15);
     int neg = 0;
     if (result[0] == '-') {
         neg = 1;
@@ -501,7 +501,7 @@ int dreformat(char* result, int len, uint64_t mantissa, int32_t exponent) {
         if (exponent > 0) {
             if (result[1] == '.') {
                 const uint32_t olength = decimalLength17(mantissa);
-                // exponent is 1 to 17
+                // exponent is 1 to 15
                 memmove(result + 1, result + 2, exponent);
                 if (exponent + 1 >= olength) {
                     // 4.XeY -> 4X00.0
