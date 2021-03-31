@@ -25,7 +25,7 @@ for subdir in ./*; do
           if [ -n "$(which banner)" ]; then
               banner "Fuzzing" "C versus" "$lang"
           fi
-          (cd c; ./fuzz.sh "$subdir")
+          (cd c; ./fuzz.sh "$lang")
           printf "%s finished differential fuzz test for language %s\n" "$(date)" "$lang"
       fi
   fi
