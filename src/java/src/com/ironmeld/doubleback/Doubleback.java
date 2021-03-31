@@ -652,6 +652,9 @@ public final class Doubleback {
       if (!isValid(value)) {
           throw new IllegalArgumentException(value);
       }
+      if (value.charAt(0) == '+') {
+          value = value.substring(1);
+      }
       if (value.toLowerCase().equals("infinity")) {
           return Double.POSITIVE_INFINITY;
       }
