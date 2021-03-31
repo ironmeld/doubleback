@@ -3,15 +3,14 @@
 ## Valid Input Format
 
 ```
-whole -> [+-] ( '0' | [1-9][0-9]{1,L} )
-fraction -> '.' [0-9]{1,R}
-exponentt -> [Ee] [+-]?[0]?[1-9]{1,3}
+whole -> [+-] ( '0' | [1-9] [0-9]{0,16} )
+fraction -> '.' [0-9]{0,16}
+exponentt -> [Ee] [+-]? [0-9]{1,3}
 
 double -> ( whole fraction? | fraction ) exponent?
 ```
 
-Also:
-* No more than 17 significant digits, excluding leading zeros
+* No more than 17 total significant digits in the whole and fraction, excluding leading zeros
 
 ## Standard Output Format
 
