@@ -6,11 +6,6 @@ os:
 dist: bionic
 osx_image: xcode12
 
-cache:
-  apt: true
-  directories:
-    - $HOME/.cache/bazel/
-
 addons:
   apt:
     sources:
