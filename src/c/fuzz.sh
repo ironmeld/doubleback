@@ -9,7 +9,7 @@ FUZZ_TIME=60
 FUZZ_MEM_MB=50
 
 if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-    WORKERS=16
+    WORKERS=1
 fi
 
 # end of config
