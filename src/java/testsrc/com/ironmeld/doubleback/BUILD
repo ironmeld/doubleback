@@ -6,7 +6,6 @@ java_test(
   srcs = glob(["*.java"]),
   deps = [
     "//src/com/ironmeld/doubleback",
-    "//testsrc/com/ironmeld/doubleback/analysis",
     "//third_party/jaffer",
     "//third_party/junit",
   ],

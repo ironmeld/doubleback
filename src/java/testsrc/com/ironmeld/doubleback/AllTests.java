@@ -20,14 +20,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  EuclidMinMaxTest.class,
-
   RyuDoubleTest.class,
-
-  SlowFloatTest.class,
-  SlowDoubleTest.class,
-
-  JafferDoubleTest.class,
 })
 public class AllTests {
 }
