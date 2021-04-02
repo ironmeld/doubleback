@@ -10,4 +10,7 @@ benchmark:
 clean:
 	make -C src clean
 
-.PHONY: all test benchmark clean
+install-deps:
+	make -C src install-deps
+
+.PHONY: all test benchmark clean install-deps

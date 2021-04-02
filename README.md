@@ -76,11 +76,16 @@ Doubleback is in development and is NOT READY for use or contributions.
 
 # Getting Started
 
-There are a number of dependencies for building Doubleback. See the [build document](docs/Build.md).
 
 ```
 git clone https://github.com/ironmeld/doubleback
 cd doubleback
+
+# The following command currently runs src/install-deps.sh and you should feel
+# free to examine that script to see what packages are being installed.
+# It currently only works with Ubuntu, Centos 8, and recent Fedora.
+sudo make install-deps
+
 make && make test && make benchmark
 ```
 

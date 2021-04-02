@@ -14,4 +14,7 @@ clean:
 	rm -f gendoubles
 	./clean.sh
 
-.PHONY: all test benchmark clean
+install-deps:
+	./install-deps.sh
+
+.PHONY: all test benchmark clean install-deps

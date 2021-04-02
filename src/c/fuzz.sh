@@ -4,7 +4,7 @@ set -e
 
 export CC=afl-clang-fast
 FUZZPROG=dfmt_fuzz
-WORKERS=48
+WORKERS="$(lscpu | grep "^CPU(s):" | awk '{print $2}')"
 FUZZ_TIME=60
 FUZZ_MEM_MB=50
 
