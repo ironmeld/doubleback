@@ -4,6 +4,14 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+if [ -n "$(which banner)" ]; then
+    BANNER=banner
+elif [ -n "$(which figlet)" ]; then
+    BANNER=figlet
+elif [ -n "$(which figlet-go)" ]; then
+    BANNER=figlet-go
+fi
+
 DFMT_TEST_INPUT="$(pwd)/test-input.csv"
 export DFMT_TEST_INPUT
 DFMT_TEST_EXPECTED="$(pwd)/test-expected.csv"
@@ -16,16 +24,16 @@ for subdir in ./*; do
       lang="${subdir/\.\//}"
 
       printf "%s starting test of language %s\n" "$(date)" "$lang"
-      if [ -n "$(which banner)" ]; then
-          banner "Testing" "$lang"
+      if [ -n "$BANNER" ]; then
+          "$BANNER" "Testing" "$lang"
       fi
       make -C "$subdir" test
       printf "%s finished test of language %s\n" "$(date)" "$lang"
   fi
 done
 
-if [ -n "$(which banner)" ]; then
-    banner "Random" "Doubles" "Test - all" "Languages"
+if [ -n "$BANNER" ]; then
+    "$BANNER" "Random" "Doubles" "Test - all" "Languages"
 fi
 # test output of each subdir against each other
 ./test-doubles.sh

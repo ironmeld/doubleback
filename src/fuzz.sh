@@ -3,6 +3,14 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+if [ -n "$(which banner)" ]; then
+    BANNER=banner
+elif [ -n "$(which figlet)" ]; then
+    BANNER=figlet
+elif [ -n "$(which figlet-go)" ]; then
+    BANNER=figlet-go
+fi
+
 for subdir in ./*; do
   # support sparse checkouts by only testing what is present
   if [ -d "$subdir" ]; then
@@ -12,8 +20,8 @@ for subdir in ./*; do
       # if the implementation has a fuzz script then run it
       if [ -f "$subdir/fuzz.sh" ]; then
           printf "%s starting fuzz test for language %s\n" "$(date)" "$lang"
-          if [ -n "$(which banner)" ]; then
-              banner "Fuzzing" "${subdir/\.\//}"
+          if [ -n "$BANNER" ]; then
+              "$BANNER" "Fuzzing" "${subdir/\.\//}"
           fi
           (cd "$subdir";./fuzz.sh)
           printf "%s finished fuzz test for language %s\n" "$(date)" "$lang"
