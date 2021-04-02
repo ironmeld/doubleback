@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/ironmeld/doubleback.svg?branch=main)](https://travis-ci.com/ironmeld/doubleback)
+
 # Table of Contents
 * [Doubleback](#doubleback)
 * [What is Ryu?](#what-is-ryu)
