@@ -8,8 +8,6 @@ if [ -n "$(which banner)" ]; then
     BANNER=banner
 elif [ -n "$(which figlet)" ]; then
     BANNER=figlet
-elif [ -n "$(which figlet-go)" ]; then
-    BANNER=figlet-go
 fi
 
 DFMT_TEST_INPUT="$(pwd)/test-input.csv"

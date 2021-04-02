@@ -7,8 +7,6 @@ if [ -n "$(which banner)" ]; then
     BANNER=banner
 elif [ -n "$(which figlet)" ]; then
     BANNER=figlet
-elif [ -n "$(which figlet-go)" ]; then
-    BANNER=figlet-go
 fi
 
 for subdir in ./*; do

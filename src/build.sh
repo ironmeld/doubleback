@@ -7,10 +7,7 @@ if [ -n "$(which banner)" ]; then
     BANNER=banner
 elif [ -n "$(which figlet)" ]; then
     BANNER=figlet
-elif [ -n "$(which figlet-go)" ]; then
-    BANNER=figlet-go
 fi
-printf "BANNER is %s\n" "$BANNER"
 
 for subdir in ./*; do
   # support sparse checkouts by only building what is present
@@ -18,7 +15,7 @@ for subdir in ./*; do
       lang="${subdir/\.\//}"
       printf "%s starting build for language %s\n" "$(date)" "$lang"
       if [ -n "$BANNER" ]; then
-          banner "Building" "$lang"
+          "$BANNER" "Building" "$lang"
       fi
       make -C "$subdir"
       printf "%s finished build for language %s\n" "$(date)" "$lang"
