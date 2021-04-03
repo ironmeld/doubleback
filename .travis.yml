@@ -42,7 +42,7 @@ install:
 before_script:
   - mkdir -p "$HOME/.cache/bazel/"
   - bazel version
-  - ls "/c/Program Files/Java/"
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then ls "/c/Program Files/Java/"; fi
   - export PATH=$PATH:"/c/Program Files/Java/jdk1.8.0_191/bin"
   - java -version
 
