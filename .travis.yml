@@ -38,16 +38,13 @@ install:
   - echo "test --test_tag_filters=-no$TRAVIS_OS_NAME" >> $HOME/.bazelrc
   - echo "test --test_output=errors" >> $HOME/.bazelrc
   - echo "test --test_verbose_timeout_warnings" >> $HOME/.bazelrc
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then export JAVA_HOME="/c/Program Files/Java/jdk1.8.0_211"; fi
 
 before_script:
   - mkdir -p "$HOME/.cache/bazel/"
   - bazel version
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then export JAVA_HOME="/c/Program Files/Java/jdk1.8.0_211"; fi
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then export PATH=$PATH:"/c/Program Files/Java/jdk1.8.0_211/bin"; fi
-  - java -version
 
 script:
-  - echo "java path is $JAVA_HOME"
   - make
   - make test
   - make benchmark
