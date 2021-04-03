@@ -42,11 +42,12 @@ install:
 before_script:
   - mkdir -p "$HOME/.cache/bazel/"
   - bazel version
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then ls "/c/Program Files/Java/"; fi
-  - export PATH=$PATH:"/c/Program Files/Java/jdk1.8.0_211/bin"
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then export JAVA_HOME="/c/Program Files/Java/jdk1.8.0_211"; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then export PATH=$PATH:"/c/Program Files/Java/jdk1.8.0_211/bin"; fi
   - java -version
 
 script:
+  - echo "java path is $JAVA_HOME"
   - make
   - make test
   - make benchmark
