@@ -4,5 +4,5 @@ java_library(
   name = "doubleback",
   srcs = glob(["*.java"]),
   # Travis CI: No Java support on Windows.
-  tags = ["nowindows"],
+  # tags = ["nowindows"],
 )
