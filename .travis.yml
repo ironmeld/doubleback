@@ -42,6 +42,9 @@ install:
 before_script:
   - mkdir -p "$HOME/.cache/bazel/"
   - bazel version
+  - ls "/c/Program Files/Java/"
+  - export PATH=$PATH:"/c/Program Files/Java/jdk1.8.0_191/bin"
+  - java -version
 
 script:
   - make
