@@ -10,7 +10,7 @@ java_test(
     "//third_party/junit",
   ],
   # Travis CI: No Java support on Windows.
-  tags = ["nowindows"],
+  # tags = ["nowindows"],
 )
 
 java_binary(
@@ -21,5 +21,5 @@ java_binary(
     "//src/com/ironmeld/doubleback",
   ],
   # Travis CI: No Java support on Windows.
-  tags = ["nowindows"],
+  # tags = ["nowindows"],
 )
