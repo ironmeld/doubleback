@@ -491,7 +491,7 @@ int dreformat(char* result, int len, uint64_t mantissa, int32_t exponent) {
             return len - 2;
         } else {
             // 4E0 -> 4.0
-            const uint32_t olength = decimalLength17(mantissa);
+            const int32_t olength = decimalLength17(mantissa);
             result[olength] = '.';
             result[olength + 1] = '0';
             return 3 + neg;
@@ -500,7 +500,7 @@ int dreformat(char* result, int len, uint64_t mantissa, int32_t exponent) {
     else {
         if (exponent > 0) {
             if (result[1] == '.') {
-                const uint32_t olength = decimalLength17(mantissa);
+                const int32_t olength = decimalLength17(mantissa);
                 // exponent is 1 to 15
                 memmove(result + 1, result + 2, exponent);
                 if (exponent + 1 >= olength) {

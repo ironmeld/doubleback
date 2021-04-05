@@ -40,9 +40,10 @@ rm -rf fuzz
 mkdir fuzz && cd fuzz || exit 1
 
 # Compile the fuzzer test proghram with afl
-"$CC" -Wall -I .. -c ../doubleback/dfmt.c -o dfmt.o
-"$CC" -Wall -I .. -c ../doubleback/dparse.c -o dparse.o
-"$CC" -Wall -I .. dfmt.o dparse.o "../tests/${FUZZPROG}.c" -o "${FUZZPROG}"
+CCWARN=(--copt="-Wall" --copt="-Wextra" --copt="-Werror") 
+"$CC" "${CCWARN[@]}" -I .. -c ../doubleback/dfmt.c -o dfmt.o
+"$CC" "${CCWARN[@]}" -I .. -c ../doubleback/dparse.c -o dparse.o
+"$CC" "${CCWARN[@]}" -I .. dfmt.o dparse.o "../tests/${FUZZPROG}.c" -o "${FUZZPROG}"
 
 # Create fuzzer seed inputs
 mkdir fuzz_in
