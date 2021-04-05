@@ -9,6 +9,4 @@ java_binary(
     "//third_party/jaffer",
     "//third_party/mersenne_java",
   ],
-  # Travis CI: No Java support on Windows.
-  # tags = ["nowindows"],
 )
