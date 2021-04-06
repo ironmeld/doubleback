@@ -21,14 +21,11 @@ addons:
     packages:
       - bazel
       - figlet
-      - gnuplot
 
 language: c
 
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install bazel make jdk8 figlet-go gnuplot; fi
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then ls "/c/Program Files/gnuplot"; fi
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then export PATH=$PATH:"/c/Program Files/gnuplot/bin"; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install bazel make jdk8 figlet-go; fi
 
 install:
   - echo "build --compilation_mode=opt" > $HOME/.bazelrc
