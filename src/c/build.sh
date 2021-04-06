@@ -7,7 +7,7 @@ export MSYS2_ARG_CONV_EXCL="//"
 fmt="\nBuilding with %s\n"
 
 if [ "$TRAVIS_OS_NAME" = "windows" ]; then
-    CCWARN=('--copt=-Wall' '--copt=-Werror')
+    CCWARN=('--copt=-Wall')
 else
     CCWARN=('--copt=-Wall' '--copt=-Wextra' '--copt=-Werror')
 fi
