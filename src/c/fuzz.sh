@@ -40,7 +40,7 @@ rm -rf fuzz
 mkdir fuzz && cd fuzz || exit 1
 
 # Compile the fuzzer test proghram with afl
-CCWARN=(--copt="-Wall" --copt="-Wextra" --copt="-Werror") 
+CCWARN=('-Wall' '-Wextra' '-Werror')
 "$CC" "${CCWARN[@]}" -I .. -c ../doubleback/dfmt.c -o dfmt.o
 "$CC" "${CCWARN[@]}" -I .. -c ../doubleback/dparse.c -o dparse.o
 "$CC" "${CCWARN[@]}" -I .. dfmt.o dparse.o "../tests/${FUZZPROG}.c" -o "${FUZZPROG}"

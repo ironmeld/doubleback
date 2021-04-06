@@ -98,7 +98,7 @@ int main (int argc, char **argv) {
         memset(buffer, 0, 100);
         read(0, buffer, 100);
 
-        for (int i = 0; i < strlen(buffer); i++) {
+        for (unsigned i = 0; i < strlen(buffer); i++) {
            if (buffer[i] == '\n' || buffer[i] == '\r') {
                buffer[i] = 0;
            }
