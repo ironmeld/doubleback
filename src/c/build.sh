@@ -34,15 +34,13 @@ if [ "$TRAVIS_OS_NAME" = "windows" ]; then
     exit 0
 fi
 
-if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-    set +e
-    ls -l /usr/local/opt/llvm/bin
-    printf "osx path is %s\n" "$PATH"
-    exit 0
-fi
 CC=gcc
 CCWARN=('-Wall' '-Wextra' '-Werror')
+CHECK="scan-build"
+if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    CHECK="/usr/local/opt/llvm/bin/scan-build"
+fi
 
-scan-build "$CC" "${CCWARN[@]}" -I . -c doubleback/dfmt.c -o dfmt.o
-scan-build "$CC" "${CCWARN[@]}" -I . -c doubleback/dparse.c -o dparse.o
+"$CHECK" "$CC" "${CCWARN[@]}" -I . -c doubleback/dfmt.c -o dfmt.o
+"$CHECK" "$CC" "${CCWARN[@]}" -I . -c doubleback/dparse.c -o dparse.o
 rm dfmt.o dparse.o
