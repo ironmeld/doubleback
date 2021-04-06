@@ -28,6 +28,16 @@
 * Pass the test-doubles.sh comparison and round-trip test
 * Pass the fuzz.sh fuzzing test
 
+## Organized and Minimalized
+
+* Test and benchmark code must be separated from the core source code.
+* The implementation must remove excess files and code that do not support the requirements.
+
+## Lints, Warnings, and Static Analysis
+
+* Within reason, code should be free of warnings from compilers and linters on a high setting
+* Within reason, code should be free of issues flagged by available static analysis and memory leak detection tools
+
 ## Implement benchmarks against native implementation
 
 * Implementation must compare dparse and dfmt to equivalent language primitives or standard libary routines
@@ -39,7 +49,6 @@
     * The dfmt and dparse APIs
     * Minimal instructions for incorporating doubleback into a project
 
-## Organized and Minimalized
+## Example Program
 
-* Test and benchmark code must be separated from the core source code.
-* The implementation must remove excess files and code that do not support the requirements.
+* The implementation must provide an example program that exercises every doubleback API

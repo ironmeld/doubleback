@@ -20,11 +20,9 @@
 
 Doubleback provides round-trip parsing and printing of 64-bit double-precision floating-point numbers using the Ryū algorithm implemented in multiple programming languages. Doubleback is biased towards "human-friendly" output which round-trips consistently between binary and decimal.
 
-The Doubleback project unifies code forked from various github projects. See [Acknowledgements](#acknowledgements).
+For example, look at the output of these functions:
 
-Look at the difference in output between these functions:
-
-glibc:
+libc:
 ```
 printf("%.17g", 0.3);
 0.29999999999999999
@@ -45,9 +43,9 @@ printf("%s", dfmt(0.3, buf));
 0.3
 ```
 
-Only dfmt formats 0.3 as "0.3".
+Doubleback's dfmt will consistently format 0.3 as "0.3". Many other libraries and programming languages will print something different depending on the options you specify.
 
-Doubleback dfmt is basically `Ryū shortest` reformatted to be like `printf("%.17g")`:
+Doubleback dfmt is basically `Ryū shortest` reformatted to be like `printf("%.17g")`. The Doubleback project provides consistent output across a number programming languages by forking and modifying existing Ryū projects on GitHub. See [Acknowledgements](#acknowledgements).
 
 # What is Ryu?
 
@@ -70,11 +68,18 @@ Doubleback merges forks of existing Ryū projects and modifies and enhances them
 
 Doubleback is in development and is NOT READY for use or contributions.
 
-# Roadmap for first release
+# Roadmap
 
-* Specify valid syntax and error behavior precisely
-* Remove extraneous code
-* Dev Documentation
+* Consolidate validation and parsing for C and java
+* Release C and Java
+* Python 3
+* TypeScript
+* Go
+* Rust
+* PHP
+* Swift
+* Ruby
+* C#
 
 # Getting Started
 
