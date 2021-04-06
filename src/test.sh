@@ -37,6 +37,12 @@ fi
 ./test-doubles.sh
 
 set +u
-if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-    ./fuzz.sh
+if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+    printf "Skip fuzzing on windows\n"
+    exit 0
 fi
+if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    printf "Skip fuzzing on osx\n"
+    exit 0
+fi
+./fuzz.sh
