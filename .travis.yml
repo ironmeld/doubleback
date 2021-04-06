@@ -21,7 +21,6 @@ addons:
     packages:
       - bazel
       - figlet
-      - llvm
 
 language: c
 

@@ -33,6 +33,11 @@ if [ "$TRAVIS_OS_NAME" = "windows" ]; then
     printf "Skipping static analysis on windows.\n"
     exit 0
 fi
+if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+    # note: if you want to enable osx, add llvm to the homebrew package list in .travis.yml
+    printf "Skipping static analysis on osx.\n"
+    exit 0
+fi
 
 CC=gcc
 CCWARN=('-Wall' '-Wextra' '-Werror')
