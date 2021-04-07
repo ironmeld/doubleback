@@ -83,7 +83,7 @@ Doubleback is in development and is NOT READY for use or contributions.
 
 # Getting Started
 
-
+Build all languages:
 ```
 git clone https://github.com/ironmeld/doubleback
 cd doubleback
@@ -93,6 +93,16 @@ cd doubleback
 # It currently only works with Ubuntu, Centos 8, and recent Fedora.
 sudo make install-deps
 
+make && make test && make benchmark
+```
+
+Alternatively, you can use git sparse-checkout to checkout and build only a subset of languages. This is an example of building only c code:
+```
+git clone --no-checkout https://github.com/ironmeld/doubleback
+cd doubleback
+git sparse-checkout init --cone
+git sparse-checkout set docs results src/c
+sudo make install-deps
 make && make test && make benchmark
 ```
 
