@@ -12,4 +12,7 @@ clean:
 	rm -rf bazel-*
 	rm -rf ~/.cache/bazel
 
-.PHONY: all test benchmark clean
+install-deps:
+	./install-deps.sh
+
+.PHONY: all test benchmark clean install-deps

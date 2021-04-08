@@ -3,57 +3,49 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+DETECTED_OS=""
 # Ubuntu 14.04, 16.04, 18.04, 20.04
 if cat /etc/*-release | grep -i "ubuntu"; then
     apt-get update -y
     apt-get upgrade -y
-
-    curl -sSL "https://bazel.build/bazel-release.pub.gpg" | sudo -E apt-key add -
-    echo "deb https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee -a /etc/apt/sources.list
-    apt-get update -y
-    apt-get install -y make gcc cmake bazel gnuplot tmux sysvbanner
-
-    if cat /etc/*-release | grep "14.04"; then
-        apt-get install -y git make clang
-        add-apt-repository -y ppa:openjdk-r/ppa
-        apt-get update
-        apt-get install -y openjdk-8-jdk
-    elif cat /etc/*-release | grep -e "16.04" -e "18.04" -e "20.04"; then
-        apt-get install -y openjdk-8-jdk-headless
-        # fuzzing is only supported on ubuntu 20.04 because it takes too much
-        # effort to get it working properly on other versions and distros.
-        if cat /etc/*-release | grep -e "20.04"; then
-            apt-get install -y afl++-clang
-        fi
-    else 
-        printf "ERROR: Unsupported Ubuntu Version.\n"
-        exit 1
-    fi
-    
-    exit 0
+    apt-get install -y sysvbanner
+    DETECTED_OS="ubuntu"
 fi
 
 # Centos 8
 if cat /etc/*-release | grep -i "centos"; then
     if cat /etc/*-release | grep -e 'VERSION="8'; then
         dnf update -y
-        dnf install -y git make gcc gcc-c++ cmake gnuplot
-        curl -O https://copr.fedorainfracloud.org/coprs/vbatts/bazel/repo/epel-8/vbatts-bazel-epel-8.repo
-        mv vbatts-bazel-epel-8.repo /etc/yum.repos.d/
-        dnf install -y bazel
-        exit 0
     fi
+    DETECTED_OS="centos8"
 fi
 
 # Fedora 33+
 if cat /etc/*-release | grep -i "fedora"; then
     dnf update -y
-    dnf install -y git make gcc gcc-c++ cmake gnuplot banner
-    dnf install -y dnf-plugins-core
-    dnf copr enable -y vbatts/bazel
-    dnf install -y bazel
-    exit 0
+    dnf install -y banner
+    DETECTED_OS="fedora"
 fi
 
-printf "Could not detect distribution.\n"
-exit 1
+if [ -z "$DETECTED_OS" ]; then
+    printf "Could not detect supported operating system.\n"
+    exit 1
+fi
+
+BANNER=""
+if [ -n "$(which banner)" ] && [ "$(uname -s)" != "Darwin" ]; then
+    BANNER=banner
+elif [ -n "$(which figlet)" ]; then
+    BANNER=figlet
+fi
+
+for subdir in ./*; do
+  # support sparse checkouts by only building what is present
+  if [ -d "$subdir" ]; then
+      lang="${subdir/\.\//}"
+      printf "%s starting install dependencies for language %s\n" "$(date)" "$lang"
+      [ -n "$BANNER" ] && "$BANNER" "Install" "deps" "$lang"
+      make -C "$subdir" install-deps
+      printf "%s finished install dependencies for language %s\n" "$(date)" "$lang"
+  fi
+done
