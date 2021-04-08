@@ -3,12 +3,12 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+BANNER=""
 if [ -n "$(which banner)" ] && [ "$(uname -s)" != "Darwin" ]; then
     BANNER=banner
 elif [ -n "$(which figlet)" ]; then
     BANNER=figlet
 fi
-printf "BANNER is %s\n" "$BANNER"
 
 for subdir in ./*; do
   # support sparse checkouts by only building what is present

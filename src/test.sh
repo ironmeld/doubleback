@@ -4,6 +4,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+BANNER=""
 if [ -n "$(which banner)" ] && [ "$(uname -s)" != "Darwin" ]; then
     BANNER=banner
 elif [ -n "$(which figlet)" ]; then

@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC2059
+# shellcheck disable=SC2059,SC2230
 
 # makes windows work with bazel's prefix for targets
 export MSYS2_ARG_CONV_EXCL="//"
@@ -35,17 +35,20 @@ if [ "$TRAVIS_OS_NAME" = "windows" ]; then
 fi
 if [ "$TRAVIS_OS_NAME" = "osx" ]; then
     # note: if you want to enable osx, add llvm to the homebrew package list in .travis.yml
+    # and add /usr/local/opt/llvm/bin to PATH.
     printf "Skipping static analysis on osx.\n"
     exit 0
 fi
 
 CC=gcc
-CCWARN=('-Wall' '-Wextra' '-Werror')
+CCOPTS=('-Wall' '-Wextra' '-Werror' '-std=c99')
 CHECK="scan-build"
-if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-    CHECK="/usr/local/opt/llvm/bin/scan-build"
-fi
 
-"$CHECK" "$CC" "${CCWARN[@]}" -I . -c doubleback/dfmt.c -o dfmt.o
-"$CHECK" "$CC" "${CCWARN[@]}" -I . -c doubleback/dparse.c -o dparse.o
-rm dfmt.o dparse.o
+if [ -n "$(which $CHECK)" ]; then
+    "$CHECK" "$CC" "${CCOPTS[@]}" -I . -c doubleback/dfmt.c -o dfmt.o
+    "$CHECK" "$CC" "${CCOPTS[@]}" -I . -c doubleback/dparse.c -o dparse.o
+    rm dfmt.o dparse.o
+else
+    printf "Skipping static analysis, %s not installed.\n" "$CHECK"
+fi
+printf "Finished build.\n"

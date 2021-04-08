@@ -16,6 +16,8 @@ fi
 if cat /etc/*-release | grep -i "centos"; then
     if cat /etc/*-release | grep -e 'VERSION="8'; then
         dnf update -y
+        dnf install -y epel-release
+        dnf install -y banner
     fi
     DETECTED_OS="centos8"
 fi

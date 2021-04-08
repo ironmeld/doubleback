@@ -16,7 +16,7 @@ if cat /etc/*-release | grep -i "ubuntu"; then
         # fuzzing is only supported on ubuntu 20.04 because it takes too much
         # effort to get it working properly on other versions and distros.
         if cat /etc/*-release | grep -e "20.04"; then
-            apt-get install -y afl++-clang
+            apt-get install -y afl++-clang clang-tools
         fi
     else 
         printf "ERROR: Unsupported Ubuntu Version.\n"
