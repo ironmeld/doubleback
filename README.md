@@ -91,17 +91,28 @@ cd doubleback
 # The following command currently runs src/install-deps.sh and you should feel
 # free to examine that script to see what packages are being installed.
 # It currently only works with Ubuntu, Centos 8, and recent Fedora.
+# Note that this will run general updates and upgrades of your system packages.
 sudo make install-deps
 
 make && make test && make benchmark
 ```
 
-Alternatively, you can use git sparse-checkout to checkout and build only a subset of languages. This is an example of building only c code:
+Alternatively, you can use git sparse-checkout to checkout and build only a subset of languages. This is an example of building only java code:
 ```
-git clone --no-checkout https://github.com/ironmeld/doubleback
+# git 2.27+
+git clone --filter=blob:none --sparse https://github.com/ironmeld/doubleback
 cd doubleback
 git sparse-checkout init --cone
-git sparse-checkout set docs results src/c
+git sparse-checkout add docs results src/java
+
+# git 2.21+
+git clone --filter=blob:none --no-checkout https://github.com/ironmeld/doubleback
+cd doubleback
+git sparse-checkout init --cone
+git sparse-checkout set docs results src/java
+```
+Then:
+```
 sudo make install-deps
 make && make test && make benchmark
 ```
