@@ -8,8 +8,16 @@ DETECTED_OS=""
 if cat /etc/*-release | grep -i "ubuntu"; then
     apt-get update -y
     apt-get upgrade -y
-    apt-get install -y sysvbanner
+    apt-get install -y git make sysvbanner
     DETECTED_OS="ubuntu"
+fi
+
+# Debian 10
+if cat /etc/*-release | grep -i "debian"; then
+    apt-get update -y
+    apt-get upgrade -y
+    apt-get install -y git make sysvbanner
+    DETECTED_OS="debian"
 fi
 
 # Centos 8
@@ -17,7 +25,7 @@ if cat /etc/*-release | grep -i "centos"; then
     if cat /etc/*-release | grep -e 'VERSION="8'; then
         dnf update -y
         dnf install -y epel-release
-        dnf install -y banner
+        dnf install -y git make banner
     fi
     DETECTED_OS="centos8"
 fi
@@ -25,7 +33,7 @@ fi
 # Fedora 33+
 if cat /etc/*-release | grep -i "fedora"; then
     dnf update -y
-    dnf install -y banner
+    dnf install -y git make banner
     DETECTED_OS="fedora"
 fi
 
@@ -41,6 +49,7 @@ elif [ -n "$(which figlet)" ]; then
     BANNER=figlet
 fi
 
+set -e
 for subdir in ./*; do
   # support sparse checkouts by only building what is present
   if [ -d "$subdir" ]; then
