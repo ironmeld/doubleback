@@ -68,12 +68,18 @@ if cat /etc/*-release | grep -i "red hat"; then
     fi
 elif cat /etc/*-release | grep -i "fedora"; then
     # Fedora 33+
-    dnf install -y gcc gcc-c++ cmake gnuplot banner
+    dnf install -y gcc gcc-c++ cmake gnuplot
     dnf install -y dnf-plugins-core
     if ! which bazel; then
         dnf copr enable -y vbatts/bazel
         dnf install -y bazel
     fi
+    exit 0
+fi
+
+# OpenSUSE Tumbleweed
+if cat /etc/*-release | grep -i "opensuse-tumbleweed"; then
+    zypper install -y  gcc gcc-c++ cmake gnuplot bazel
     exit 0
 fi
 

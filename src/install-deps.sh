@@ -44,6 +44,13 @@ elif cat /etc/*-release | grep -i "fedora"; then
     DETECTED_OS="fedora"
 fi
 
+# OpenSUSE Tumbleweed
+if cat /etc/*-release | grep -i "opensuse-tumbleweed"; then
+    zypper update -y
+    zypper install -y make figlet
+    DETECTED_OS="opensuse"
+fi
+
 if [ -z "$DETECTED_OS" ]; then
     printf "Could not detect supported operating system.\n"
     exit 1

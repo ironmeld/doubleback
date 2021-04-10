@@ -88,25 +88,11 @@ elif cat /etc/*-release | grep -i "fedora"; then
     exit 0
 fi
 
-printf "Could not detect distribution.\n"
-exit 1
-
-
-if [ -n "$(which banner)" ] && [ "$(uname -s)" != "Darwin" ]; then
-    BANNER=banner
-elif [ -n "$(which figlet)" ]; then
-    BANNER=figlet
+# OpenSUSE Tumbleweed
+if cat /etc/*-release | grep -i "opensuse-tumbleweed"; then
+    zypper install -y gnuplot bazel
+    exit 0
 fi
 
-for subdir in ./*; do
-  # support sparse checkouts by only building what is present
-  if [ -d "$subdir" ]; then
-      lang="${subdir/\.\//}"
-      printf "%s starting install dependencies for language %s\n" "$(date)" "$lang"
-      if [ -n "$BANNER" ]; then
-          "$BANNER" "Install" "deps" "$lang"
-      fi
-      make -C "$subdir" install-deps
-      printf "%s finished install dependencies for language %s\n" "$(date)" "$lang"
-  fi
-done
+printf "Could not detect supported operating system.\n"
+exit 1
