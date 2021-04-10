@@ -36,12 +36,3 @@ if [ -n "$BANNER" ]; then
 fi
 # test output of each subdir against each other
 ./test-doubles.sh
-
-set +u
-if cat /etc/*-release | grep -i ubuntu && cat /etc/*-release | grep -e "20.04" -e "20.10"; then
-    ./fuzz.sh
-elif [ "$TRAVIS_OS_NAME" = "linux" ]; then
-    ./fuzz.sh
-else
-    printf "Skipped fuzzing because not on Ubuntu 20.04 or 20.10 or travis.\n"
-fi

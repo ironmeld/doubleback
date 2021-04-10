@@ -7,10 +7,13 @@ test:
 benchmark:
 	make -C src benchmark
 
+fuzztest:
+	make -C src fuzztest
+
 clean:
 	make -C src clean
 
 install-deps:
 	make -C src install-deps
 
-.PHONY: all test benchmark clean install-deps
+.PHONY: all test benchmark fuzztest clean install-deps

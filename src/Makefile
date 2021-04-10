@@ -10,6 +10,9 @@ test: gendoubles
 benchmark:
 	./benchmark.sh
 
+fuzztest:
+	./fuzz.sh
+
 clean:
 	rm -f gendoubles
 	./clean.sh
@@ -17,4 +20,4 @@ clean:
 install-deps:
 	./install-deps.sh
 
-.PHONY: all test benchmark clean install-deps
+.PHONY: all test benchmark fuzztest clean install-deps

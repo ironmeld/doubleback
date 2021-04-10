@@ -4,13 +4,8 @@ set -e
 
 export CC=afl-clang-fast
 FUZZPROG=dfmt_fuzz
-WORKERS="$(lscpu | grep "^CPU(s):" | awk '{print $2}')"
 FUZZ_TIME=60
 FUZZ_MEM_MB=50
-
-if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-    WORKERS=1
-fi
 
 # end of config
 
@@ -24,6 +19,14 @@ if [ -n "$ALT_LANG" ]; then
     fi
 else
     FUZZARGS=()
+fi
+
+if (( $(nproc) > 24 )); then
+     WORKERS=$(( $(nproc) - 9 ))
+elif (( $(nproc) > 3 )); then
+     WORKERS=$(( $(nproc) - 3 ))
+else
+     WORKERS=0
 fi
 
 if [ "$ALT_LANG" = "java" ]; then
@@ -83,8 +86,11 @@ for worker in $(seq "$WORKERS"); do
     tmux send-keys -t fuzz-worker-"$worker".0 afl-fuzz SPACE -i SPACE fuzz_in SPACE -x SPACE vocab SPACE -o SPACE fuzz_out SPACE -M SPACE worker"$worker" SPACE -m SPACE "$FUZZ_MEM_MB" SPACE -t SPACE 8000 -- SPACE ./${FUZZPROG} "${FUZZARGS[@]}" ENTER
 done
 
+tmux new -d -s fuzz-watch
+tmux send-keys -t fuzz-watch watch SPACE afl-whatsup SPACE -s SPACE fuzz_out ENTER
+
 printf "%s Fuzzers started.\n" "$(date)"
-printf "To see progress, attached to tmux window \"fuzz-master\" or use afl-whatsup.\n"
+printf "To see progress, attached to tmux window \"fuzz-watch\".\n"
 printf "Fuzzing for %d seconds. Press return to end early: " "$FUZZ_TIME"
 set +e
 read -t "$FUZZ_TIME" -r _
@@ -92,10 +98,12 @@ set -e
 
 afl-whatsup -s fuzz_out
 printf "Fuzzers are being terminated. Please wait ...\n"
-tmux kill-window -t fuzz-master
 for worker in $(seq "$WORKERS"); do
     tmux kill-window -t fuzz-worker-"$worker"
 done
+tmux kill-window -t fuzz-master
+tmux kill-window -t fuzz-watch
+
 cd ..
 
 crashcount="$(find fuzz/fuzz_out/master/crashes -name "id*" 2> /dev/null | wc -l)"
