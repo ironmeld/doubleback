@@ -16,10 +16,10 @@ if cat /etc/*-release | grep -i "ubuntu"; then
 
     if cat /etc/*-release | grep "14.04"; then
         apt-get install -y clang
-    elif cat /etc/*-release | grep -e "16.04" -e "18.04" -e "20.04"; then
+    elif cat /etc/*-release | grep -e "16.04" -e "18.04" -e "20.04" -e "20.10"; then
         # fuzzing is only supported on ubuntu 20.04 because it takes too much
         # effort to get it working properly on other versions and distros.
-        if cat /etc/*-release | grep -e "20.04"; then
+        if cat /etc/*-release | grep -e "20.04" -e "20.10"; then
             apt-get install -y afl++-clang clang-tools
         fi
     else 

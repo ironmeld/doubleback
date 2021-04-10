@@ -38,12 +38,10 @@ fi
 ./test-doubles.sh
 
 set +u
-if [ "$TRAVIS_OS_NAME" = "windows" ]; then
-    printf "Skip fuzzing on windows\n"
-    exit 0
+if cat /etc/*-release | grep -i ubuntu && cat /etc/*-release | grep -e "20.04" -e "20.10"; then
+    ./fuzz.sh
+elif [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    ./fuzz.sh
+else
+    printf "Skipped fuzzing because not on Ubuntu 20.04 or 20.10 or travis.\n"
 fi
-if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-    printf "Skip fuzzing on osx\n"
-    exit 0
-fi
-./fuzz.sh

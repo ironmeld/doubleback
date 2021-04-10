@@ -20,7 +20,7 @@ if cat /etc/*-release | grep -i "ubuntu"; then
             apt-get update -y
             apt-get install -y openjdk-8-jdk
         fi
-    elif cat /etc/*-release | grep -e "16.04" -e "18.04" -e "20.04"; then
+    elif cat /etc/*-release | grep -e "16.04" -e "18.04" -e "20.04" -e "20.10"; then
         if ! which java; then
             apt-get install -y openjdk-8-jdk-headless
         fi
