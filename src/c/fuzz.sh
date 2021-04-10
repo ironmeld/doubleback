@@ -21,10 +21,8 @@ else
     FUZZARGS=()
 fi
 
-if (( $(nproc) > 24 )); then
-     WORKERS=$(( $(nproc) - 9 ))
-elif (( $(nproc) > 3 )); then
-     WORKERS=$(( $(nproc) - 3 ))
+if (( $(nproc) > 7 )); then
+     WORKERS=$(( $(nproc) / 2 ))
 else
      WORKERS=0
 fi
