@@ -47,5 +47,5 @@ before_script:
 script:
   - make
   - make test
-  - make fuzztest
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then make fuzztest; fi
   - make benchmark
