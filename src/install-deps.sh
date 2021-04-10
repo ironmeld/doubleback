@@ -30,8 +30,15 @@ if cat /etc/*-release | grep -i "centos"; then
     DETECTED_OS="centos8"
 fi
 
-# Fedora 33+
-if cat /etc/*-release | grep -i "fedora"; then
+# Red Hat 8
+if cat /etc/*-release | grep -i "red hat"; then
+    if cat /etc/*-release | grep -e 'VERSION="8'; then
+        dnf update -y
+        dnf install -y git make
+    fi
+    DETECTED_OS="redhat8"
+elif cat /etc/*-release | grep -i "fedora"; then
+    # Fedora 33+
     dnf update -y
     dnf install -y git make banner
     DETECTED_OS="fedora"
@@ -43,13 +50,12 @@ if [ -z "$DETECTED_OS" ]; then
 fi
 
 BANNER=""
-if [ -n "$(which banner)" ] && [ "$(uname -s)" != "Darwin" ]; then
+if which banner && [ "$(uname -s)" != "Darwin" ]; then
     BANNER=banner
-elif [ -n "$(which figlet)" ]; then
+elif which figlet; then
     BANNER=figlet
 fi
 
-set -e
 for subdir in ./*; do
   # support sparse checkouts by only building what is present
   if [ -d "$subdir" ]; then

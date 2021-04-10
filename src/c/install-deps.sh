@@ -55,8 +55,19 @@ if cat /etc/*-release | grep -i "centos"; then
     fi
 fi
 
-# Fedora 33+
-if cat /etc/*-release | grep -i "fedora"; then
+# Red Hat 8
+if cat /etc/*-release | grep -i "red hat"; then
+    if cat /etc/*-release | grep -e 'VERSION="8'; then
+        dnf install -y gcc gcc-c++ cmake gnuplot
+        if ! which bazel; then
+            curl -O https://copr.fedorainfracloud.org/coprs/vbatts/bazel/repo/epel-8/vbatts-bazel-epel-8.repo
+            mv vbatts-bazel-epel-8.repo /etc/yum.repos.d/
+            dnf install -y bazel
+        fi
+        exit 0
+    fi
+elif cat /etc/*-release | grep -i "fedora"; then
+    # Fedora 33+
     dnf install -y gcc gcc-c++ cmake gnuplot banner
     dnf install -y dnf-plugins-core
     if ! which bazel; then
