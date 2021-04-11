@@ -8,10 +8,27 @@ if cat /etc/*-release | grep -i "ubuntu"; then
     apt-get install -y gnuplot
 
     if ! which bazel; then
-        curl -sSL "https://bazel.build/bazel-release.pub.gpg" | apt-key add -
-        echo "deb https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee -a /etc/apt/sources.list
-        apt-get update -y
-        apt-get install -y bazel
+        if [ "$(arch)" = x86_64 ]; then
+            curl -sSL "https://bazel.build/bazel-release.pub.gpg" | apt-key add -
+            echo "deb https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee -a /etc/apt/sources.list
+            apt-get update -y
+            apt-get install -y bazel
+        elif [ "$(arch)" = aarch64 ]; then
+            # build bazel from scratch
+            apt-get install -y build-essential openjdk-11-jdk python zip unzip
+            mkdir ~/build-bazel
+            cd ~/build-bazel
+            # -O preserves filename -L follows links
+            curl -OL https://github.com/bazelbuild/bazel/releases/download/4.0.0/bazel-4.0.0-dist.zip
+            unzip bazel-4.0.0-dist.zip
+            # takes upwards of 15 minutes
+            env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
+            cp ~/build-bazel/output/bazel /usr/local/bin/
+        else
+            printf "ERROR: Unsupported architecture: %s\n" "$(arch)"
+            exit 1
+        fi
+
     fi
 
     if cat /etc/*-release | grep "14.04"; then
