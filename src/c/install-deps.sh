@@ -37,6 +37,8 @@ if cat /etc/*-release | grep -i "ubuntu"; then
         # effort to get it working properly on other versions and distros.
         if cat /etc/*-release | grep -e "20.04" -e "20.10"; then
             apt-get install -y afl++-clang clang-tools
+            printf "INFO: echo core | sudo tee /proc/sys/kernel/core_pattern\n"
+            echo core | sudo tee /proc/sys/kernel/core_pattern
         fi
     else 
         printf "ERROR: Unsupported Ubuntu Version.\n"

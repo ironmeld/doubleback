@@ -31,8 +31,9 @@ if [ "$ALT_LANG" = "java" ]; then
     FUZZ_MEM_MB=48000 # needed due to jvm allocation bug
 fi
 
-# afl requires this
 if ! grep -q core < /proc/sys/kernel/core_pattern; then
+    printf "Kernel core pattern needs to be setup for AFL fuzzing\n"
+    printf "You may be prompted for your password for sudo.\n"
     echo core | sudo tee /proc/sys/kernel/core_pattern
 fi
 
@@ -81,7 +82,7 @@ tmux send-keys -t fuzz-master.0 afl-fuzz SPACE -i SPACE fuzz_in SPACE -x SPACE v
 
 for worker in $(seq "$WORKERS"); do
     tmux new -d -s fuzz-worker-"$worker"
-    tmux send-keys -t fuzz-worker-"$worker".0 afl-fuzz SPACE -i SPACE fuzz_in SPACE -x SPACE vocab SPACE -o SPACE fuzz_out SPACE -M SPACE worker"$worker" SPACE -m SPACE "$FUZZ_MEM_MB" SPACE -t SPACE 8000 -- SPACE ./${FUZZPROG} "${FUZZARGS[@]}" ENTER
+    tmux send-keys -t fuzz-worker-"$worker".0 afl-fuzz SPACE -i SPACE fuzz_in SPACE -x SPACE vocab SPACE -o SPACE fuzz_out SPACE -M SPACE worker"$worker" SPACE -m SPACE "$FUZZ_MEM_MB" SPACE -t SPACE 8000 SPACE -- SPACE ./${FUZZPROG} "${FUZZARGS[@]}" ENTER
 done
 
 tmux new -d -s fuzz-watch
