@@ -23,11 +23,11 @@ public class BenchmarkMain {
   public static void main(String[] args) {
     int samples = 1000;
     int iterations = 1000;
-    boolean data = false;
+    boolean bydigits = false;
     boolean csv = false;
     for (String s : args) {
-      if (s.equals("-data")) {
-        data = true;
+      if (s.equals("-bydigits")) {
+        bydigits = true;
       } else if (s.equals("-csv")) {
         csv = true;
       } else if (s.startsWith("-samples=")) {
@@ -40,10 +40,17 @@ public class BenchmarkMain {
     if (csv) {
       System.out.println("float_bits_as_int,jdk_out,jdk_time,jdk_len,jaffer_out,jaffer_time,jaffer_len,ryu_out,ryu_time,ryu_len,dfmt_out,dfmt_time,dfmt_len");
     } else {
-      System.out.printf("    Average & Stddev Ryu  Average & Stddev Jdk  Average & Stddev Jaffer\n");
+      if (bydigits) {
+          System.out.printf("%7s %7s %7s %5s %5s %7s %7s %5s %5s %7s %7s %5s %5s %7s %7s %5s %5s %7s %7s %7s %7s\n", "digits",
+                        "jdk ns", "stddev", "len", "stdev",
+                        "jaff.ns", "stddev", "len", "stdev",
+                        "ryu", "stddev", "len", "stdev",
+                        "dfmt", "stddev", "len", "stdev",
+                        "jdk par", "stddev", "dparse", "stddev");
+      }
     }
     int throwaway = 0;
-    throwaway += bench64(samples, iterations, data);
+    throwaway += bench64(samples, iterations, bydigits, csv);
     if (args.length == 1000) {
       // Prevent the compiler from optimizing the code away. Technically, the
       // JIT could see that args.length != 1000, but it seems unlikely.
@@ -51,7 +58,7 @@ public class BenchmarkMain {
     }
   }
 
-  private static int bench64(int samples, int iterations, boolean data) {
+  private static int bench64(int samples, int iterations, boolean bydigits, boolean csv) {
     MersenneTwister twister = new MersenneTwister(12345);
     // Warm up the JIT.
     MeanAndVariance warmUp = new MeanAndVariance();
@@ -78,19 +85,29 @@ public class BenchmarkMain {
       warmUp.update((stop - start) / 100.0);
     }
 
+    MeanAndVariance jdk_parse_time_mv = new MeanAndVariance();
+    MeanAndVariance s2d_parse_time_mv = new MeanAndVariance();
+   
+    MeanAndVariance d2s_time_mv = new MeanAndVariance();
+    MeanAndVariance d2s_len_mv = new MeanAndVariance();
+    MeanAndVariance jdk_time_mv = new MeanAndVariance();
+    MeanAndVariance jdk_len_mv = new MeanAndVariance();
+    MeanAndVariance jaffer_time_mv = new MeanAndVariance();
+    MeanAndVariance jaffer_len_mv = new MeanAndVariance();
+    MeanAndVariance dfmt_time_mv = new MeanAndVariance();
+    MeanAndVariance dfmt_len_mv = new MeanAndVariance();
     twister.setSeed(12345);
     for (int precision = 1; precision <= 17; precision++) {
-       MeanAndVariance jdk_parse_time_mv = new MeanAndVariance();
-       MeanAndVariance s2d_parse_time_mv = new MeanAndVariance();
+      jdk_parse_time_mv = new MeanAndVariance();
+      s2d_parse_time_mv = new MeanAndVariance();
    
-       MeanAndVariance d2s_time_mv = new MeanAndVariance();
-       MeanAndVariance d2s_len_mv = new MeanAndVariance();
-       MeanAndVariance jdk_time_mv = new MeanAndVariance();
-       MeanAndVariance jdk_len_mv = new MeanAndVariance();
-       MeanAndVariance jaffer_time_mv = new MeanAndVariance();
-       MeanAndVariance jaffer_len_mv = new MeanAndVariance();
-       MeanAndVariance dfmt_time_mv = new MeanAndVariance();
-       MeanAndVariance dfmt_len_mv = new MeanAndVariance();
+      d2s_time_mv = new MeanAndVariance();
+      d2s_len_mv = new MeanAndVariance();
+      jdk_time_mv = new MeanAndVariance();
+      jdk_len_mv = new MeanAndVariance();
+      jaffer_time_mv = new MeanAndVariance();
+      jaffer_len_mv = new MeanAndVariance();
+      dfmt_time_mv = new MeanAndVariance();
 
       for (int i = 0; i < samples; i++) {
 
@@ -178,9 +195,8 @@ public class BenchmarkMain {
         double jdk_time = (stop - start) / (double) iterations;
         jdk_time_mv.update(jdk_time);
         jdk_len_mv.update(Double.toString(f).length());
-        //System.out.println(jdk_time);
 
-        if (data) {
+        if (!bydigits && csv) {
           System.out.printf("%s,%s,%s,%s,",
               Long.toUnsignedString(r),
               Double.toString(f),
@@ -205,37 +221,93 @@ public class BenchmarkMain {
           System.out.printf("\n");
         }
       }
-      if (!data) {
-        System.out.printf("%d,", precision);
-        System.out.printf("%.3f,%.3f,",
+      if (bydigits) {
+        if (csv) {
+          System.out.printf("%d,", precision);
+          System.out.printf("%.3f,%.3f,",
             Double.valueOf(jdk_time_mv.mean()), Double.valueOf(jdk_time_mv.stddev()));
-        System.out.printf("%.3f,%.3f,",
+          System.out.printf("%.3f,%.3f,",
             Double.valueOf(jdk_len_mv.mean()), Double.valueOf(jdk_len_mv.stddev()));
 
-        System.out.printf("%.3f,%.3f,",
+          System.out.printf("%.3f,%.3f,",
             Double.valueOf(jaffer_time_mv.mean()), Double.valueOf(jaffer_time_mv.stddev()));
-        System.out.printf("%.3f,%.3f,",
+          System.out.printf("%.3f,%.3f,",
             Double.valueOf(jaffer_len_mv.mean()), Double.valueOf(jaffer_len_mv.stddev()));
 
-        System.out.printf("%.3f,%.3f,",
+          System.out.printf("%.3f,%.3f,",
             Double.valueOf(d2s_time_mv.mean()), Double.valueOf(d2s_time_mv.stddev()));
-        System.out.printf("%.3f,%.3f,",
+          System.out.printf("%.3f,%.3f,",
             Double.valueOf(d2s_len_mv.mean()), Double.valueOf(d2s_len_mv.stddev()));
 
-        System.out.printf("%.3f,%.3f,",
+          System.out.printf("%.3f,%.3f,",
             Double.valueOf(dfmt_time_mv.mean()), Double.valueOf(dfmt_time_mv.stddev()));
-        System.out.printf("%.3f,%.3f,",
+          System.out.printf("%.3f,%.3f,",
             Double.valueOf(dfmt_len_mv.mean()), Double.valueOf(dfmt_len_mv.stddev()));
 
-        System.out.printf("%.3f,%.3f,",
+          System.out.printf("%.3f,%.3f,",
             Double.valueOf(jdk_parse_time_mv.mean()), Double.valueOf(jdk_parse_time_mv.stddev()));
 
-        System.out.printf("%.3f,%.3f",
+          System.out.printf("%.3f,%.3f",
             Double.valueOf(s2d_parse_time_mv.mean()), Double.valueOf(s2d_parse_time_mv.stddev()));
 
-        System.out.printf("\n");
+          System.out.printf("\n");
+        } else {
+          System.out.printf("%-7d ", precision);
+          System.out.printf("%7.1f ±%-7.1f",
+            Double.valueOf(jdk_time_mv.mean()), Double.valueOf(jdk_time_mv.stddev()));
+          System.out.printf("%5.1f ±%-5.1f",
+            Double.valueOf(jdk_len_mv.mean()), Double.valueOf(jdk_len_mv.stddev()));
+
+          System.out.printf("%7.1f ±%-7.1f",
+            Double.valueOf(jaffer_time_mv.mean()), Double.valueOf(jaffer_time_mv.stddev()));
+          System.out.printf("%5.1f ±%-5.1f",
+            Double.valueOf(jaffer_len_mv.mean()), Double.valueOf(jaffer_len_mv.stddev()));
+
+          System.out.printf("%7.1f ±%-7.1f",
+            Double.valueOf(d2s_time_mv.mean()), Double.valueOf(d2s_time_mv.stddev()));
+          System.out.printf("%5.1f ±%-5.1f",
+            Double.valueOf(d2s_len_mv.mean()), Double.valueOf(d2s_len_mv.stddev()));
+
+          System.out.printf("%7.1f ±%-7.1f",
+            Double.valueOf(dfmt_time_mv.mean()), Double.valueOf(dfmt_time_mv.stddev()));
+          System.out.printf("%5.1f ±%-5.1f",
+            Double.valueOf(dfmt_len_mv.mean()), Double.valueOf(dfmt_len_mv.stddev()));
+
+          System.out.printf("%7.1f ±%-7.1f",
+            Double.valueOf(jdk_parse_time_mv.mean()), Double.valueOf(jdk_parse_time_mv.stddev()));
+
+          System.out.printf("%7.1f ±%-7.1f",
+            Double.valueOf(s2d_parse_time_mv.mean()), Double.valueOf(s2d_parse_time_mv.stddev()));
+
+          System.out.printf("\n");
+        }
       }
     }
+    if (!bydigits && !csv) {
+      System.out.printf("Print Time in ns:\n");
+      System.out.printf(" %-20s: %7.2f ±%-7.2f\n", "jdk Double.toString",
+                        Double.valueOf(jdk_time_mv.mean()), Double.valueOf(jdk_time_mv.stddev()));
+      System.out.printf(" %-20s: %7.2f ±%-7.2f\n", "Doubleback dfmt",
+                        Double.valueOf(dfmt_time_mv.mean()), Double.valueOf(dfmt_time_mv.stddev()));
+  
+      System.out.printf("\nLength in characters:\n");
+      System.out.printf(" %-20s: %7.2f ±%-7.2f\n", "jdk Double.toString",
+                        Double.valueOf(jdk_len_mv.mean()), Double.valueOf(jdk_len_mv.stddev()));
+      System.out.printf(" %-20s: %7.2f ±%-7.2f\n", "Doubleback dfmt",
+                        Double.valueOf(dfmt_len_mv.mean()), Double.valueOf(dfmt_len_mv.stddev()));
+  
+      System.out.printf("\ndfmt prints %.3f TIMES FASTER than Double.toString!\n", Double.valueOf(jdk_time_mv.mean()) / Double.valueOf(dfmt_time_mv.mean()));
+  
+      System.out.printf("\nParse Time in ns: \n");
+      System.out.printf(" %7s: %7.2f ±%-7.2f\n", "jdk parse",
+                        Double.valueOf(jdk_parse_time_mv.mean()), Double.valueOf(jdk_parse_time_mv.stddev()));
+      System.out.printf(" %7s: %7.2f ±%-7.2f\n", "dparse",
+                        Double.valueOf(s2d_parse_time_mv.mean()), Double.valueOf(s2d_parse_time_mv.stddev()));
+  
+      System.out.printf("\ndparse parses %.3f TIMES FASTER than strtod!\n",
+                        Double.valueOf(jdk_parse_time_mv.mean()) / Double.valueOf(s2d_parse_time_mv.mean()));
+    }
+
     return throwaway + (int) throwaway_f;
   }
 }

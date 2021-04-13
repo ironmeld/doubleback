@@ -5,7 +5,7 @@
   name = lang + "-double-shortest-64bit-data-csv",
   tools = [dep],
   outs = [lang + "-double-shortest-64bit-data.csv"],
-  cmd = "$(location " + dep + ") -data -csv > $@",
+  cmd = "$(location " + dep + ") -csv > $@",
 ) for (lang,dep) in [
     ("c", "//benchmark:ryu_benchmark_shortest"),
   ]
@@ -39,7 +39,7 @@ CONVERSION_CMD_RYU_SHORTEST="".join([
   name = lang + "-double-shortest-bydigits-summary-csv",
   tools = [dep],
   outs = [lang + "-double-shortest-bydigits-summary.csv"],
-  cmd = "$(location " + dep + ") -csv > $@",
+  cmd = "$(location " + dep + ") -bydigits -csv > $@",
 ) for (lang,dep) in [
     ("c", "//benchmark:ryu_benchmark_shortest"),
   ]

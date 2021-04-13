@@ -4,6 +4,9 @@ set -e
 # makes windows work with bazel's prefix for targets
 export MSYS2_ARG_CONV_EXCL="//"
 
+bazel run -c opt //testsrc/com/ironmeld/doubleback/benchmark -- -bydigits -samples=25
+bazel run -c opt //testsrc/com/ironmeld/doubleback/benchmark -- -samples=25
+
 bazel build -c opt --jobs=1 //scripts:java-double-shortest-bydigits-summary.csv
 bazel build -c opt --jobs=1 //scripts:java-double-shortest-64bit-data.csv
 

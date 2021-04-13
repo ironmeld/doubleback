@@ -82,7 +82,7 @@ double generate_double(uint64_t* r) {
   return f;
 }
 
-static int bench64_general(const uint32_t samples, const uint32_t iterations, const bool data, const bool csv) {
+static int bench64_general(const uint32_t samples, const uint32_t iterations, const bool bydigits, const bool csv) {
   char input[BUFFER_SIZE];
   char buffer_dfmt[BUFFER_SIZE];
   char buffer_snprintf[BUFFER_SIZE];
@@ -105,7 +105,7 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
   mean_and_variance dparse_time_mv;
   init(&dparse_time_mv);
 
-  if (data) {
+  if (!bydigits) {
     if (csv) {
       printf("intval,snprintf,snp_time,snp_length,dfmt_time,dfmt_len,strtod_time,dparse_time\n");
     }
@@ -126,8 +126,7 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
   for (precision=1; precision <= 17; precision++) {
 
     // "bydigits" needs to reset on every change in digits of precision
-    // but "data" does not
-    if (!data) {
+    if (bydigits) {
        init(&snp_time_mv);
        init(&snp_len_mv);
        init(&dfmt_time_mv);
@@ -184,7 +183,7 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
       update(&dfmt_time_mv, dfmt_time);
       update(&dfmt_len_mv, (double) strlen(buffer_dfmt));
 
-      if (data && csv) {
+      if (!bydigits && csv) {
         printf("%" PRIu64 ",%s,%f,%f,%s,%f,%f,%f,%f\n", r,
             buffer_snprintf, snp_time, (double) strlen(buffer_snprintf),
             buffer_dfmt, dfmt_time, (double) strlen(buffer_dfmt),
@@ -192,7 +191,7 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
       }
     }
     // summary stats by digits of precision
-    if (!data) {
+    if (bydigits) {
         if (csv) {
           printf("%d,", precision);
           printf("%.3f,%.3f,", snp_time_mv.mean, stddev(&snp_time_mv));
@@ -214,7 +213,7 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
     }
   }
 
-  if (data && !csv) {
+  if (!bydigits && !csv) {
     printf("Print Time in ns:\n");
     printf(" %-20s: %7.2f ±%-.2f\n", "libc snprintf %.17g", snp_time_mv.mean, stddev(&snp_time_mv));
     printf(" %-20s: %7.2f ±%-.2f\n", "Doubleback dfmt", dfmt_time_mv.mean, stddev(&dfmt_time_mv));
@@ -225,7 +224,7 @@ static int bench64_general(const uint32_t samples, const uint32_t iterations, co
 
     printf("\ndfmt prints %.3f TIMES FASTER than printf!\n", snp_time_mv.mean / dfmt_time_mv.mean);
 
-    printf("\nParse Time: \n");
+    printf("\nParse Time in ns: \n");
     printf(" %7s: %7.2f ±%-.2f\n", "strtod", strtod_time_mv.mean, stddev(&strtod_time_mv));
     printf(" %7s: %7.2f ±%-.2f\n", "dparse", dparse_time_mv.mean, stddev(&dparse_time_mv));
 
@@ -249,11 +248,11 @@ int main(int argc, char** argv) {
   int32_t samples = 500;
   int32_t iterations = 1000;
   bool csv = false;
-  bool data = false;
+  bool bydigits = false;
   for (int i = 1; i < argc; i++) {
     char* arg = argv[i];
-    if (strcmp(arg, "-data") == 0) {
-      data = true;
+    if (strcmp(arg, "-bydigits") == 0) {
+      bydigits = true;
     } else if (strncmp(arg, "-samples=", 9) == 0) {
       sscanf(arg, "-samples=%i", &samples);
     } else if (strncmp(arg, "-iterations=", 12) == 0) {
@@ -266,7 +265,7 @@ int main(int argc, char** argv) {
   setbuf(stdout, NULL);
 
   int throwaway = 0;
-  throwaway += bench64_general(samples, iterations, data, csv);
+  throwaway += bench64_general(samples, iterations, bydigits, csv);
   if (argc == 1000) {
     // Prevent the compiler from optimizing the code away.
     printf("%d\n", throwaway);
