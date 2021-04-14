@@ -19,15 +19,13 @@ addons:
       - sysvbanner
   homebrew:
     packages:
-      - bazel
       - figlet
 
 language: c
 
-before_install:
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install bazel make jdk8 figlet-go; fi
-
 install:
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then choco install bazel make jdk8 figlet-go; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo make install-deps; fi
   - echo "build --compilation_mode=opt" > $HOME/.bazelrc
   - if [ "$TRAVIS_OS_NAME" != "windows" ]; then echo "build --conlyopt=-std=c99" > $HOME/.bazelrc; fi
   - echo "build --disk_cache=$HOME/.cache/bazel/" >> $HOME/.bazelrc
