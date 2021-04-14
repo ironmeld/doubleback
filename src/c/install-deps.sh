@@ -101,5 +101,18 @@ if cat /etc/*-release | grep -i "opensuse-tumbleweed"; then
     exit 0
 fi
 
+
+if uname -a | grep Darwin; then
+    # build bazel from scratch
+    mkdir ~/build-bazel
+    cd ~/build-bazel
+    # -O preserves filename -L follows links
+    curl -OL https://github.com/bazelbuild/bazel/releases/download/4.0.0/bazel-4.0.0-dist.zip
+    unzip bazel-4.0.0-dist.zip
+    # takes upwards of 15 minutes
+    env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
+    cp ~/build-bazel/output/bazel /usr/local/bin/
+fi
+
 printf "Could not detect supported operating system.\n"
 exit 1
