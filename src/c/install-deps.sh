@@ -3,6 +3,19 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+if uname -a | grep Darwin; then
+    # build bazel from scratch
+    mkdir ~/build-bazel
+    cd ~/build-bazel
+    # -O preserves filename -L follows links
+    curl -OL https://github.com/bazelbuild/bazel/releases/download/4.0.0/bazel-4.0.0-dist.zip
+    unzip bazel-4.0.0-dist.zip
+    # takes upwards of 15 minutes
+    env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
+    cp ~/build-bazel/output/bazel /usr/local/bin/
+    exit 0
+fi
+
 # Ubuntu 14.04, 16.04, 18.04, 20.04
 if cat /etc/*-release | grep -i "ubuntu"; then
     apt-get install -y gcc cmake gnuplot tmux
@@ -99,19 +112,6 @@ fi
 if cat /etc/*-release | grep -i "opensuse-tumbleweed"; then
     zypper install -y  gcc gcc-c++ cmake gnuplot bazel
     exit 0
-fi
-
-
-if uname -a | grep Darwin; then
-    # build bazel from scratch
-    mkdir ~/build-bazel
-    cd ~/build-bazel
-    # -O preserves filename -L follows links
-    curl -OL https://github.com/bazelbuild/bazel/releases/download/4.0.0/bazel-4.0.0-dist.zip
-    unzip bazel-4.0.0-dist.zip
-    # takes upwards of 15 minutes
-    env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
-    cp ~/build-bazel/output/bazel /usr/local/bin/
 fi
 
 printf "Could not detect supported operating system.\n"
