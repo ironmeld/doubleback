@@ -5,6 +5,8 @@ os:
 
 dist: bionic
 osx_image: xcode12
+jdk:
+  - openjdk11
 
 addons:
   apt:
