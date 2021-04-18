@@ -39,8 +39,10 @@ install:
   - echo "test --test_output=errors" >> $HOME/.bazelrc
   - echo "test --test_verbose_timeout_warnings" >> $HOME/.bazelrc
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then export JAVA_HOME="/c/Program Files/Java/jdk1.8.0_211"; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then export PATH="$PATH:$JAVA_HOME/bin"; ls "$JAVA_HOME/bin"; fi
 
 before_script:
+  - echo "$PATH"
   - mkdir -p "$HOME/.cache/bazel/"
   - bazel version
   - java -version
