@@ -58,15 +58,20 @@ fi
 
 case "$DETECTED_OS" in
     osx)
-        # build bazel from scratch
-        mkdir ~/build-bazel
-        cd ~/build-bazel
-        # -O preserves filename -L follows links
-        curl -OL https://github.com/bazelbuild/bazel/releases/download/4.0.0/bazel-4.0.0-dist.zip
-        unzip bazel-4.0.0-dist.zip
-        # takes upwards of 15 minutes
-        env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
-        cp ~/build-bazel/output/bazel /usr/local/bin/
+        if ! which bazel; then
+            # build bazel from scratch
+            mkdir ~/build-bazel
+            cd ~/build-bazel
+            # -O preserves filename -L follows links
+            curl -OL https://github.com/bazelbuild/bazel/releases/download/4.0.0/bazel-4.0.0-dist.zip
+            unzip bazel-4.0.0-dist.zip
+            # Apply this patch manually until it is released:
+            # https://github.com/bazelbuild/bazel/commit/0216ee54417fa1f2fef14f6eb14cbc1e8f595821
+            sed -i 's/sourceJar, null/sourceJar, (ClassLoader) null/' ./src/java_tools/buildjar/java/com/google/devtools/build/buildjar/VanillaJavaBuilder.java
+            # takes upwards of 15 minutes
+            env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
+            cp ~/build-bazel/output/bazel /usr/local/bin/
+        fi
         ;;
 
     ubuntu)

@@ -43,6 +43,7 @@ install:
 before_script:
   - mkdir -p "$HOME/.cache/bazel/"
   - bazel version
+  - java -version
 
 script:
   - make
