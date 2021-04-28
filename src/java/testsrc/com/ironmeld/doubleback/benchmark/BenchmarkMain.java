@@ -108,6 +108,7 @@ public class BenchmarkMain {
       jaffer_time_mv = new MeanAndVariance();
       jaffer_len_mv = new MeanAndVariance();
       dfmt_time_mv = new MeanAndVariance();
+      dfmt_len_mv = new MeanAndVariance();
 
       for (int i = 0; i < samples; i++) {
 
