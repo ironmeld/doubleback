@@ -33,10 +33,10 @@ public abstract class DoubleToStringTest {
 
   @Test
   public void simpleCases() {
-    assertD2sEquals("0.0", 0);
-    assertD2sEquals("-0.0", Double.longBitsToDouble(0x8000000000000000L));
-    assertD2sEquals("1.0", 1.0d);
-    assertD2sEquals("-1.0", -1.0d);
+    assertD2sEquals("0", 0);
+    assertD2sEquals("-0", Double.longBitsToDouble(0x8000000000000000L));
+    assertD2sEquals("1", 1.0d);
+    assertD2sEquals("-1", -1.0d);
     assertD2sEquals("NaN", Double.NaN);
     assertD2sEquals("Infinity", Double.POSITIVE_INFINITY);
     assertD2sEquals("-Infinity", Double.NEGATIVE_INFINITY);

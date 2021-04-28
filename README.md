@@ -246,7 +246,6 @@ The third opinion is that Ryū is the right algorithm at the right time for impl
 Doubleback implements its own format which is similar to "%.17g" but it is NOT intended to be an exact drop-in replacement.
 
 Doubleback dfmt is different from printf("%.17g") in these ways:
-* All numbers have a decimal point or an exponent
 * It uses Ryū to pick the shortest representation
 * It does not zero-pad small exponents
 * It does not print a plus sign for positive exponents

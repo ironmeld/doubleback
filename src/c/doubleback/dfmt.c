@@ -474,8 +474,8 @@ static inline int copy_special_str_dfmt(char * const result, const bool sign, co
     memcpy(result + sign, "Infinity", 8);
     return sign + 8;
   }
-  memcpy(result + sign, "0.0", 3);
-  return sign + 3;
+  memcpy(result + sign, "0", 1);
+  return sign + 1;
 }
 
 int dreformat(char* result, int len, uint64_t mantissa, int32_t exponent) {
@@ -490,38 +490,34 @@ int dreformat(char* result, int len, uint64_t mantissa, int32_t exponent) {
             // 1.132E0 just strip off E0
             return len - 2;
         } else {
-            // 4E0 -> 4.0
-            const int32_t olength = decimalLength17(mantissa);
-            result[olength] = '.';
-            result[olength + 1] = '0';
-            return 3 + neg;
+            // 4E0 -> 4
+            return 1 + neg;
         }
     }
     else {
         if (exponent > 0) {
             if (result[1] == '.') {
+                // 4.XeY
                 const int32_t olength = decimalLength17(mantissa);
                 // exponent is 1 to 15
-                memmove(result + 1, result + 2, exponent);
                 if (exponent + 1 >= olength) {
-                    // 4.XeY -> 4X00.0
+                    // FIXME: using exponent is ok but overkill, should be olength - 1 ?
+                    memmove(result + 1, result + 2, exponent);
+                    // 4.XeY -> 4X00
                     if (exponent + 1 > olength) {
                         memset(result + olength, '0', exponent + 1 - olength);
                     }
-                    result[exponent + 1] = '.';
-                    result[exponent + 2] = '0';
-                    return exponent + 3 + neg;
+                    return exponent + 1 + neg;
                 } else {
                     // 4.XYeZ -> 4X.Y
+                    memmove(result + 1, result + 2, exponent);
                     result[exponent + 1] = '.';
                     return len - (decimalLength17(exponent) + 1);
                 }
             } else {
-                // 4EX -> 4{'0'*X}.0
+                // 4EX -> 4{'0'*X}
                 memset(result + 1, '0', exponent);
-                result[exponent + 1] = '.';
-                result[exponent + 2] = '0';
-                return exponent + 3 + neg;
+                return exponent + 1 + neg;
             }
         }
         else {

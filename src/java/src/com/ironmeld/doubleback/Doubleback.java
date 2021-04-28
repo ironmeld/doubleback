@@ -109,8 +109,8 @@ public final class Doubleback {
     if (value == Double.POSITIVE_INFINITY) return "Infinity";
     if (value == Double.NEGATIVE_INFINITY) return "-Infinity";
     long bits = Double.doubleToLongBits(value);
-    if (bits == 0) return "0.0";
-    if (bits == 0x8000000000000000L) return "-0.0";
+    if (bits == 0) return "0";
+    if (bits == 0x8000000000000000L) return "-0";
 
     // Otherwise extract the mantissa and exponent bits and run the full algorithm.
     int ieeeExponent = (int) ((bits >>> DOUBLE_MANTISSA_BITS) & DOUBLE_EXPONENT_MASK);
@@ -325,7 +325,6 @@ public final class Doubleback {
       result[index++] = '-';
     }
 
-    // Values in the interval [1E-3, 1E7) are special.
     if (scientificNotation) {
       // Print in the format x.xxxxxE-yy.
       for (int i = 0; i < olength - 1; i++) {
@@ -388,8 +387,8 @@ public final class Doubleback {
         for (int i = olength; i < exp + 1; i++) {
           result[index++] = '0';
         }
-        result[index++] = '.';
-        result[index++] = '0';
+        //result[index++] = '.';
+        //result[index++] = '0';
       } else {
         // Decimal dot is somewhere between the digits.
         int current = index + 1;
