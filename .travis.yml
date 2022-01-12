@@ -22,6 +22,7 @@ addons:
   homebrew:
     packages:
       - figlet
+      - bazel
 
 language: c
 
